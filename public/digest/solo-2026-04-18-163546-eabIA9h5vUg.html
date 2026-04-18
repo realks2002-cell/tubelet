@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tubelet · 2026.04.18 (토)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+
+:root {
+  --bg: #FFFFFF;
+  --bg-tint: #F5F2EC;
+  --ink: #1A1814;
+  --ink-2: #4A4540;
+  --ink-3: #8A847C;
+  --ink-4: #B8B0A4;
+  --rule: #EAE5DA;
+  --rule-strong: #D6CEBE;
+  --accent: oklch(0.72 0.14 75);
+  --accent-ink: oklch(0.32 0.10 60);
+  --accent-bg: oklch(0.95 0.04 80);
+  --positive: oklch(0.55 0.12 145);
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); }
+body {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+.page { max-width: 780px; margin: 0 auto; padding: 56px 40px 120px; }
+
+/* ─── Top bar ─── */
+.top { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+.mark {
+  width: 26px; height: 26px; background: var(--ink);
+  border-radius: 7px; display: inline-grid; place-items: center;
+  color: #fff; align-self: center;
+}
+.mark::before {
+  content: '';
+  width: 0; height: 0;
+  border-left: 7px solid currentColor;
+  border-top: 4.5px solid transparent;
+  border-bottom: 4.5px solid transparent;
+  margin-left: 2px;
+}
+.brand {
+  font-family: var(--font-sans); font-size: 20px;
+  font-weight: 600; letter-spacing: -0.01em;
+}
+.brand em { font-style: italic; color: var(--ink-3); font-weight: 400; }
+.top .v {
+  margin-left: auto; font-family: var(--font-mono);
+  font-size: 11px; color: var(--ink-3); letter-spacing: 0.05em;
+}
+
+/* ─── Masthead ─── */
+.masthead {
+  margin: 28px 0 64px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--rule);
+}
+.eyebrow {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.masthead h1 {
+  font-family: var(--font-sans); font-size: 60px; font-weight: 700;
+  letter-spacing: -0.03em; line-height: 1;
+  margin: 14px 0 14px; text-wrap: balance;
+}
+.masthead h1 em { font-style: italic; color: var(--ink-3); font-weight: 500; }
+.masthead .lead {
+  font-family: var(--font-sans); font-size: 19px; font-weight: 500;
+  line-height: 1.5; color: var(--ink-2);
+  max-width: 620px; text-wrap: pretty; margin: 0;
+}
+.meta-row {
+  display: flex; gap: 32px; margin-top: 28px;
+  font-size: 12.5px; color: var(--ink-3); flex-wrap: wrap;
+}
+.meta-row .k {
+  display: block; font-family: var(--font-mono);
+  font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.meta-row .v { color: var(--ink); font-size: 13px; font-weight: 500; }
+
+/* ─── Article ─── */
+.article {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.article:last-of-type { border-bottom: none; }
+
+.art-meta {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 12px; color: var(--ink-3); margin-bottom: 18px;
+}
+.art-num {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--ink-3); text-transform: uppercase;
+  padding: 2px 8px; border: 1px solid var(--rule); border-radius: 4px;
+}
+.art-channel { font-weight: 500; color: var(--ink-2); }
+.sep { color: var(--ink-4); }
+.mono { font-family: var(--font-mono); }
+
+.art-headline {
+  font-family: var(--font-sans); font-size: 36px; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.1;
+  margin: 0 0 14px; text-wrap: balance;
+}
+
+.art-deck {
+  font-family: var(--font-sans); font-size: 19px; font-weight: 500;
+  line-height: 1.5; color: var(--ink-2);
+  margin: 0 0 32px; text-wrap: pretty;
+}
+
+.art-thumb {
+  display: block; margin: 0 0 32px;
+  border: 1px solid var(--rule); border-radius: 10px; overflow: hidden;
+  background: var(--bg-tint);
+}
+.art-thumb img {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover;
+  border-bottom: 1px solid var(--rule);
+}
+.art-thumb-caption {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 12px 16px;
+  background: #fff;
+}
+.art-thumb-caption .mono {
+  font-size: 10.5px; color: var(--ink-3);
+  letter-spacing: 0.08em; text-transform: uppercase; flex-shrink: 0;
+}
+.art-thumb-title {
+  font-size: 13px; color: var(--ink-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 1; min-width: 0;
+}
+.art-thumb:hover .art-thumb-title { color: var(--ink); }
+
+/* Stocks section */
+.stocks {
+  margin: 0 0 32px;
+  padding: 28px 0 0;
+  border-top: 1px solid var(--rule);
+}
+.stocks-head {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.stocks-legend {
+  margin-left: auto;
+  font-size: 10.5px; color: var(--ink-4);
+  letter-spacing: 0.06em; text-transform: lowercase;
+}
+.stocks-list {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.stock {
+  border: 1px solid var(--rule); border-radius: 10px;
+  padding: 20px 22px;
+}
+.stock-head {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 14px;
+  align-items: center; margin-bottom: 12px;
+}
+.stock-num {
+  font-size: 11px; color: var(--ink-3);
+  letter-spacing: 0.08em; padding: 3px 8px;
+  border: 1px solid var(--rule); border-radius: 4px;
+}
+.stock-title { min-width: 0; }
+.stock-name {
+  font-family: var(--font-sans); font-size: 19px; font-weight: 600;
+  letter-spacing: -0.015em; margin: 0 0 4px;
+  line-height: 1.2;
+}
+.stock-meta {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  font-size: 11.5px;
+}
+.stock-ticker {
+  font-size: 11px; color: var(--ink-3);
+  padding: 2px 7px; background: var(--bg-tint); border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+.stock-sector {
+  font-size: 11.5px; color: var(--ink-2);
+}
+.stock-sector::before { content: '· '; color: var(--ink-4); }
+.stock-meta > *:first-child.stock-sector::before { content: ''; }
+
+.stock-catalyst {
+  font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+  color: var(--ink); line-height: 1.5;
+  margin: 0 0 10px; padding-left: 12px;
+  border-left: 2px solid var(--accent);
+}
+.stock-analysis {
+  font-family: var(--font-sans); font-size: 14.5px; font-weight: 400;
+  color: var(--ink-2); line-height: 1.65;
+  margin: 0; text-wrap: pretty;
+  white-space: pre-wrap;
+}
+.stock-levels {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px dashed var(--rule);
+  font-size: 12.5px; color: var(--ink-2);
+}
+.stock-levels .lab {
+  font-size: 10px; color: var(--ink-3);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* Sentiment chips */
+.chip.sent-bull {
+  background: oklch(0.95 0.05 145); color: oklch(0.35 0.12 145);
+}
+.chip.sent-bear {
+  background: oklch(0.95 0.05 28); color: oklch(0.4 0.14 28);
+}
+.chip.sent-watch {
+  background: var(--accent-bg); color: var(--accent-ink);
+}
+.chip.sent-neutral {
+  background: var(--bg-tint); color: var(--ink-2);
+}
+
+/* Actions box (dark) */
+.act-box {
+  background: var(--ink); color: #F2EDE3;
+  border-radius: 10px; padding: 24px 26px;
+  margin: 0 0 28px;
+}
+.act-box .lab {
+  font-size: 10.5px; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--ink-4); margin-bottom: 8px;
+}
+.act-box h3 {
+  font-family: var(--font-sans); font-size: 18px; font-weight: 500;
+  margin: 0 0 14px; color: #fff; letter-spacing: -0.01em;
+}
+.act-box .it {
+  display: grid; grid-template-columns: 28px 1fr; gap: 14px;
+  padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.12);
+  align-items: start; font-size: 14px; line-height: 1.55;
+}
+.act-box .it:first-of-type { border-top: none; padding-top: 2px; }
+.act-box .it .n {
+  font-family: var(--font-sans); font-size: 17px; font-weight: 600;
+  color: var(--accent); line-height: 1; padding-top: 3px;
+  letter-spacing: -0.01em;
+}
+
+/* Chips row */
+.chips-row {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin: 0 0 28px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; padding: 3px 10px; border-radius: 999px;
+  background: var(--bg-tint); color: var(--ink-2); font-weight: 500;
+}
+.chip.accent { background: var(--accent-bg); color: var(--accent-ink); }
+
+/* CTA */
+.art-cta { display: flex; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 6px;
+  font-size: 13px; font-weight: 500; border: 1px solid transparent;
+  transition: all .12s;
+}
+.btn.ol {
+  border-color: var(--rule-strong); color: var(--ink); background: #fff;
+}
+.btn.ol:hover { background: var(--bg-tint); }
+
+/* Empty state */
+.empty {
+  padding: 80px 0; text-align: center; border-bottom: 1px solid var(--rule);
+}
+.empty .t-label {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  color: var(--ink-3); text-transform: uppercase; margin: 0 0 12px;
+}
+.empty h2 {
+  font-family: var(--font-sans); font-size: 28px; font-weight: 600;
+  letter-spacing: -0.02em; margin: 0 0 10px;
+}
+.empty p { color: var(--ink-3); font-size: 14px; margin: 0; }
+
+/* Footer */
+.foot {
+  margin-top: 80px; padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  display: flex; gap: 14px; color: var(--ink-3);
+  font-size: 12px; align-items: center;
+}
+.foot .sp { flex: 1; }
+.foot .mono { font-family: var(--font-mono); font-size: 11px; }
+
+/* ─── Mobile ─── */
+@media (max-width: 560px) {
+  .page { padding: 36px 20px 80px; }
+  .masthead h1 { font-size: 44px; }
+  .masthead .lead { font-size: 17px; }
+  .meta-row { gap: 20px; }
+  .article { padding: 48px 0; }
+  .art-headline { font-size: 28px; }
+  .art-deck { font-size: 17px; margin-bottom: 24px; }
+  .act-box { padding: 20px; }
+  .act-box .it { grid-template-columns: 24px 1fr; gap: 10px; }
+  .stock { padding: 16px 18px; }
+  .stock-head { grid-template-columns: auto 1fr; row-gap: 8px; }
+  .stock-head .chip { grid-column: 2; justify-self: start; }
+  .stock-name { font-size: 17px; }
+}
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <div class="mark" aria-hidden="true"></div>
+    <div class="brand">Tubelet<em>.</em></div>
+    <span class="v">Daily Digest · 2026.04.18 (토) · 16:35</span>
+  </div>
+
+  <header class="masthead">
+    <div class="eyebrow">Tubelet / Daily Digest</div>
+    <h1>오늘의 <em>이야기</em></h1>
+    <p class="lead">주덕 채널에서 1편이 올라왔고, 모두 정리해서 담았어요.</p>
+    <div class="meta-row">
+      <div><span class="k">Videos</span><span class="v">1편</span></div>
+      <div><span class="k">Channels</span><span class="v">주덕</span></div>
+      <div><span class="k">Generated</span><span class="v">Claude Haiku 4.5</span></div>
+    </div>
+  </header>
+
+  <article class="article">
+
+  <div class="art-meta">
+    <span class="art-num">01</span>
+    <span class="art-channel">주덕</span>
+    <span class="sep">·</span><span class="mono">2026.04.18 (토) 13:05</span>
+    <span class="sep">·</span>
+    <span class="mono">자막 기반</span>
+  </div>
+
+  <h2 class="art-headline">손실 복구의 핵심은 저가 회복 지점에서의 타이밍</h2>
+
+  <p class="art-deck">유튜버가 우주 테마 추격 매수 실패로 손실을 입었으나, 바이오 종목에서 저가 회복 구간(시가 회복, 거래량 증가 시점)을 정확히 포착하여 추가 매수하고 급등으로 손실을 전부 복구한 경험을 공유합니다. 원전 수익 실현 후 손절, 미국 증시 변동성 등으로 어려운 장세 속에서도 자신의 관심 종목에만 집중할 것을 강조합니다.</p>
+
+  <a class="art-thumb" href="https://www.youtube.com/watch?v=eabIA9h5vUg" target="_blank" rel="noopener">
+    <img src="https://i.ytimg.com/vi/eabIA9h5vUg/hqdefault.jpg" alt="" />
+    <div class="art-thumb-caption">
+      <span class="mono">원본 제목</span>
+      <span class="art-thumb-title">손실 복구한 방법 - 이 선을 회복하니 바로 급등 ㄷㄷ</span>
+    </div>
+  </a>
+
+  <section class="stocks">
+  <div class="stocks-head">
+    <span class="eyebrow">종목 분석 · 4개</span>
+    <span class="stocks-legend mono">catalyst · analysis · key levels</span>
+  </div>
+  <div class="stocks-list">
+    <article class="stock">
+  <div class="stock-head">
+    <span class="stock-num mono">01</span>
+    <div class="stock-title">
+      <h4 class="stock-name">바이오 종목 (미상)</h4>
+      <div class="stock-meta">
+        
+        <span class="stock-sector">바이오</span>
+      </div>
+    </div>
+    <span class="chip sent-bull">강세</span>
+  </div>
+  <p class="stock-catalyst">저가 회복 구간에서 정확한 타이밍 매수 후 급등으로 손실 전액 복구</p>
+  <p class="stock-analysis">유튜버는 이 종목에서 초기 매수 후 살짝 하락할 때 비중을 조절했고, 이후 차트 패턴을 관찰하며 대기했습니다. 핵심 타이밍은 음봉의 시가(시초가)를 회복하면서 동시에 거래량이 증가한 구간이었습니다. 이 지점은 초기 매수가도 함께 회복되는 시점으로, 매수세가 강하다는 것을 나타내는 신호입니다. 유튜버는 이러한 신호를 인식하고 추가 매수를 단행했으며, 운좋게 매수 직후 급등(슈팅)이 나타나 오전 손실분을 전액 복구할 수 있었습니다. 이는 차트 회복 구간에서의 정확한 타점 진입의 중요성을 보여주는 사례입니다.</p>
+  <div class="stock-levels">
+        <span class="mono lab">Key Levels</span>
+        <span>음봉 시가 회복 구간, 초기 매수가 회복 수준</span>
+      </div>
+</article>
+<article class="stock">
+  <div class="stock-head">
+    <span class="stock-num mono">02</span>
+    <div class="stock-title">
+      <h4 class="stock-name">원전 관련 종목</h4>
+      <div class="stock-meta">
+        
+        <span class="stock-sector">원전</span>
+      </div>
+    </div>
+    <span class="chip sent-neutral">중립</span>
+  </div>
+  <p class="stock-catalyst">어제 수익 실현했으나 오늘 조정으로 손절 대응</p>
+  <p class="stock-analysis">유튜버의 원전 테마 포지션은 전날 수익을 냈으나, 오늘 장에서 조정을 받아 손절 처리되었습니다. 현재 시장 변동성이 크다는 맥락에서 수익 보호 차원의 손절로 판단되며, 장세 전환을 대기하는 중입니다.</p>
+  
+</article>
+<article class="stock">
+  <div class="stock-head">
+    <span class="stock-num mono">03</span>
+    <div class="stock-title">
+      <h4 class="stock-name">우주 테마 관련 종목(들)</h4>
+      <div class="stock-meta">
+        
+        <span class="stock-sector">우주</span>
+      </div>
+    </div>
+    <span class="chip sent-bear">약세</span>
+  </div>
+  <p class="stock-catalyst">오늘 오전 우주 테마 급등 시 다른 종목으로 추격 매수 후 손절</p>
+  <p class="stock-analysis">유튜버는 원래 관심있던 우주 테마 종목들이 큰 폭 상승하는 것을 보고, 자신의 포지션이 따라가지 못하자 다른 우주 테마 종목을 추격 매수했습니다. 이는 전형적인 FOMO(Fear Of Missing Out) 매매로 판단되며, 결과적으로 손절로 마감되었습니다. 유튜버는 이를 통해 관심 종목에만 차분하게 대응해야 한다는 교훈을 얻고 있습니다.</p>
+  
+</article>
+<article class="stock">
+  <div class="stock-head">
+    <span class="stock-num mono">04</span>
+    <div class="stock-title">
+      <h4 class="stock-name">삼성 핏스</h4>
+      <div class="stock-meta">
+        
+        
+      </div>
+    </div>
+    <span class="chip sent-bear">약세</span>
+  </div>
+  <p class="stock-catalyst">아침 손절 처리, 보유자의 재료 학습 부족 언급</p>
+  <p class="stock-analysis">다른 출연자가 삼성 핏스에서 손절을 했다고 언급하면서 재료 공부를 더 해야 할 필요성을 느낀 상황입니다. 자세한 분석 내용은 영상에 제시되지 않았으나, 이는 충분한 재료 파악 없이 진입한 포지션의 손실 사례로 보입니다.</p>
+  
+</article>
+  </div>
+</section>
+
+  <div class="act-box">
+    <div class="lab">핵심 포인트 · 4개</div>
+    <h3>이 영상의 요점</h3>
+    <div class="it"><div class="n">01</div><div>우주 테마 급등장에서 다른 종목 추격 매수로 손절당함 - FOMO 위험 경고</div></div><div class="it"><div class="n">02</div><div>저가 회복 구간(음봉 시가 회복 + 거래량 증가)은 매수세 강화 신호</div></div><div class="it"><div class="n">03</div><div>이미 매수한 종목의 이전 매수가 회복 시점이 차분한 추가 매수 타점</div></div><div class="it"><div class="n">04</div><div>관심 종목 집중 vs 무리한 추격 매수 - 일관된 매매 원칙 강조</div></div>
+  </div>
+
+  <div class="chips-row">
+    <span class="chip accent">AI 요약</span>
+    <span class="chip">차트 타이밍 - 저가 회복 구간</span><span class="chip">손실 복구 사례</span><span class="chip">FOMO 추격 매수 위험</span><span class="chip">매매 규율 - 관심 종목 집중</span>
+  </div>
+
+  <div class="art-cta">
+    <a class="btn ol" href="https://www.youtube.com/watch?v=eabIA9h5vUg" target="_blank" rel="noopener">
+      YouTube에서 영상 보기
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h8v8"/><path d="M13 3L3 13"/></svg>
+    </a>
+  </div>
+
+</article>
+
+  <footer class="foot">
+    <span>Tubelet · Personal Digest</span>
+    <span>·</span>
+    <span>2026.04.18 (토)</span>
+    <div class="sp"></div>
+    <span class="mono">v0.1</span>
+  </footer>
+
+</div>
+</body>
+</html>

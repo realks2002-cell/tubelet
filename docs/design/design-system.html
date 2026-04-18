@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>Tubelet 디자인 시스템</title>
+<meta name="viewport" content="width=1200" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+:root{
+  --bg:#FFFFFF;
+  --bg-tint:#F5F2EC;
+  --ink:#1A1814;
+  --ink-2:#4A4540;
+  --ink-3:#8A847C;
+  --ink-4:#B8B0A4;
+  --rule:#EAE5DA;
+  --rule-strong:#D6CEBE;
+  --accent:oklch(0.72 0.14 75);
+  --accent-ink:oklch(0.32 0.10 60);
+  --accent-bg:oklch(0.95 0.04 80);
+  --positive:oklch(0.55 0.12 145);
+  --danger:oklch(0.58 0.17 28);
+
+  --font-serif:'Pretendard Variable','Pretendard',-apple-system,system-ui,sans-serif;
+  --font-sans:'Pretendard Variable','Pretendard',-apple-system,system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg)}
+body{font-family:var(--font-sans);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:none;background:none;padding:0;color:inherit}
+
+/* Layout */
+.page{max-width:1080px;margin:0 auto;padding:56px 40px 120px}
+
+.top{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.mark{width:26px;height:26px;background:var(--ink);border-radius:7px;display:inline-grid;place-items:center;color:#fff;align-self:center}
+.mark::before{content:'';width:0;height:0;border-left:7px solid currentColor;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;margin-left:2px}
+.brand{font-family:var(--font-serif);font-size:20px;font-weight:500;letter-spacing:-0.01em}
+.brand em{font-style:italic;color:var(--ink-3);font-weight:400}
+.top .v{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--ink-3);letter-spacing:0.05em}
+
+.masthead{margin:28px 0 56px;padding-bottom:36px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-3)}
+.masthead h1{font-family:var(--font-serif);font-size:64px;font-weight:700;letter-spacing:-0.03em;line-height:1;margin:14px 0 14px;text-wrap:balance}
+.masthead h1 em{font-style:italic;color:var(--ink-3)}
+.masthead .lead{font-family:var(--font-serif);font-size:20px;line-height:1.5;color:var(--ink-2);max-width:680px;text-wrap:pretty}
+
+.meta-row{display:flex;gap:32px;margin-top:28px;font-size:12.5px;color:var(--ink-3)}
+.meta-row .k{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px}
+.meta-row .v{color:var(--ink);font-size:13px;font-weight:500}
+
+/* Sections */
+.sec{margin:80px 0 0}
+.sec-hd{display:flex;align-items:baseline;gap:18px;padding-bottom:14px;border-bottom:1px solid var(--rule);margin-bottom:28px}
+.sec-hd .num{font-family:var(--font-mono);font-size:11px;letter-spacing:0.14em;color:var(--ink-3);text-transform:uppercase}
+.sec-hd h2{font-family:var(--font-serif);font-size:32px;font-weight:600;letter-spacing:-0.02em;margin:0}
+.sec-hd .desc{margin-left:auto;color:var(--ink-3);font-size:12.5px;max-width:360px;text-align:right}
+
+/* ===== TYPE ===== */
+.type-scale{display:flex;flex-direction:column}
+.type-row{display:grid;grid-template-columns:160px 1fr 140px;gap:24px;padding:22px 0;border-bottom:1px solid var(--rule);align-items:center}
+.type-row .label{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);letter-spacing:0.08em;text-transform:uppercase}
+.type-row .label b{display:block;color:var(--ink);font-family:var(--font-sans);font-size:13px;margin-bottom:3px;letter-spacing:0.02em;text-transform:none}
+.type-row .spec{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);text-align:right;line-height:1.5}
+
+.t-display{font-family:var(--font-serif);font-size:54px;font-weight:600;letter-spacing:-0.025em;line-height:1.02}
+.t-display em{font-style:italic;color:var(--ink-3);font-weight:500}
+.t-h1{font-family:var(--font-serif);font-size:36px;font-weight:600;letter-spacing:-0.02em;line-height:1.05}
+.t-h2{font-family:var(--font-serif);font-size:24px;font-weight:600;letter-spacing:-0.015em;line-height:1.2}
+.t-deck{font-family:var(--font-serif);font-size:19px;font-weight:500;line-height:1.5;color:var(--ink-2)}
+.t-body{font-family:var(--font-serif);font-size:17px;line-height:1.65}
+.t-ui{font-family:var(--font-sans);font-size:14px}
+.t-meta{font-family:var(--font-sans);font-size:12.5px;color:var(--ink-3)}
+.t-label{font-family:var(--font-sans);font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--ink-3);font-weight:500}
+.t-mono{font-family:var(--font-mono);font-size:12px;color:var(--ink-2)}
+
+.family-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px;margin-bottom:36px}
+.family{border:1px solid var(--rule);border-radius:10px;padding:22px}
+.family .fam-name{font-size:12px;color:var(--ink-3);margin-bottom:14px;font-family:var(--font-mono);letter-spacing:0.05em}
+.family .sample{font-size:36px;letter-spacing:-0.02em;line-height:1.1;margin-bottom:12px}
+.family .aa{display:flex;gap:4px;font-size:11.5px;color:var(--ink-3)}
+.family .aa span{padding:3px 7px;border:1px solid var(--rule);border-radius:4px}
+.family.serif .sample{font-family:var(--font-serif);font-weight:600}
+.family.sans .sample{font-family:var(--font-sans);font-weight:500}
+.family.mono .sample{font-family:var(--font-mono);font-size:28px}
+
+/* ===== COLORS ===== */
+.palette{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.sw{border:1px solid var(--rule);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.sw .chip{height:120px;display:flex;align-items:flex-end;padding:12px}
+.sw .chip .dot{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.35)}
+.sw .txt{padding:14px}
+.sw .nm{font-weight:500;font-size:13px;margin-bottom:6px}
+.sw .hex{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);display:flex;gap:8px;flex-wrap:wrap}
+.sw .role{font-size:11.5px;color:var(--ink-3);margin-top:8px;line-height:1.5}
+
+.ramp{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin-bottom:28px}
+.ramp .step{padding:22px 14px 16px;display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--rule)}
+.ramp .step:last-child{border-right:none}
+.ramp .step .lb{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);letter-spacing:0.05em;text-transform:uppercase}
+.ramp .step .hx{font-family:var(--font-mono);font-size:11px;color:var(--ink-2);margin-top:2px}
+.ramp .step .nm{font-size:12px;font-weight:500;margin-top:10px}
+
+.semantic{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.sem{padding:16px 18px;border:1px solid var(--rule);border-radius:10px;display:flex;gap:12px;align-items:center}
+.sem .bub{width:24px;height:24px;border-radius:50%;flex:none}
+.sem .nm{font-size:13px;font-weight:500}
+.sem .d{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+
+/* ===== SPACING / RADIUS ===== */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.box{border:1px solid var(--rule);border-radius:10px;padding:24px}
+.box-h{font-family:var(--font-serif);font-size:18px;font-weight:500;margin:0 0 4px}
+.box-sh{font-size:12.5px;color:var(--ink-3);margin-bottom:22px}
+
+.space-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-top:1px solid var(--rule)}
+.space-row:first-of-type{border-top:none;padding-top:0}
+.space-row .bar{background:var(--ink);height:16px;border-radius:2px;flex:none}
+.space-row .tk{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);flex:1;text-align:right}
+.space-row .tk b{color:var(--ink);font-weight:500;margin-right:8px}
+
+.radius-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px}
+.radius{flex:1;min-width:100px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.radius .shape{width:68px;height:68px;background:var(--ink);border:1px solid var(--rule)}
+.radius .tk{font-family:var(--font-mono);font-size:11px;color:var(--ink-3)}
+.radius .nm{font-size:12px;font-weight:500}
+
+/* ===== COMPONENTS ===== */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.comp{border:1px solid var(--rule);border-radius:10px;padding:0;overflow:hidden}
+.comp-hd{display:flex;align-items:baseline;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--bg-tint)}
+.comp-hd h3{font-family:var(--font-serif);font-size:15px;font-weight:500;margin:0}
+.comp-hd .tag{font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:0.08em;text-transform:uppercase}
+.comp-body{padding:24px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;min-height:120px;justify-content:center}
+.comp-wide{grid-column:span 2}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;border:1px solid transparent;transition:all .12s}
+.btn.pri{background:var(--ink);color:#fff}
+.btn.pri:hover{background:#000}
+.btn.ol{border-color:var(--rule-strong);color:var(--ink);background:#fff}
+.btn.ol:hover{background:var(--bg-tint)}
+.btn.gh{color:var(--ink-2)}
+.btn.gh:hover{background:var(--bg-tint);color:var(--ink)}
+.btn.sm{padding:5px 10px;font-size:12px}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--bg-tint);color:var(--ink-2);font-weight:500}
+.chip.accent{background:var(--accent-bg);color:var(--accent-ink)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 3px oklch(0.58 0.17 28 / 0.18)}
+
+/* Toggle */
+.toggle{width:38px;height:22px;background:var(--bg-tint);border-radius:999px;border:1px solid var(--rule);position:relative;transition:.15s}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:.15s}
+.toggle.on{background:var(--ink);border-color:var(--ink)}
+.toggle.on::after{left:18px}
+
+/* Channel chip (inline) */
+.ch-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border:1px solid var(--rule);border-radius:999px;font-size:12.5px;color:var(--ink-2)}
+.ch-chip .av{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-serif);font-size:12px;font-weight:600}
+.ch-chip .cnt{margin-left:4px;padding:1px 6px;background:var(--bg-tint);border-radius:999px;font-size:11px;color:var(--ink-3);font-family:var(--font-mono)}
+
+/* Summary row (component) */
+.sum-row{display:grid;grid-template-columns:120px 1fr auto;gap:18px;padding:16px 0;border-top:1px solid var(--rule);align-items:start;width:100%}
+.sum-row:first-child{border-top:none}
+.sum-row .thumb{aspect-ratio:16/10;border-radius:6px;background:repeating-linear-gradient(135deg,var(--bg-tint) 0 10px,#fff 10px 20px);border:1px solid var(--rule)}
+.sum-row .src{font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.sum-row .src b{color:var(--ink-2);font-weight:500}
+.sum-row .t{font-family:var(--font-serif);font-size:17px;font-weight:500;letter-spacing:-0.01em;margin:0 0 5px;line-height:1.3}
+.sum-row .tldr{font-size:12.5px;color:var(--ink-2);margin:0;line-height:1.5}
+.sum-row .meta{text-align:right;font-size:11px;color:var(--ink-3);white-space:nowrap;font-family:var(--font-mono)}
+
+/* Insight card */
+.ins-card{border:1px solid var(--rule);border-radius:10px;padding:16px 18px;width:100%}
+.ins-card .n{font-family:var(--font-serif);font-size:12px;color:var(--ink-3);margin-bottom:8px}
+.ins-card h4{font-family:var(--font-serif);font-size:17px;font-weight:500;margin:0 0 6px;letter-spacing:-0.01em}
+.ins-card p{font-size:12.5px;color:var(--ink-2);margin:0;line-height:1.5}
+
+/* Pull quote */
+.pq-demo{font-family:var(--font-serif);font-style:italic;font-size:20px;line-height:1.35;letter-spacing:-0.01em;border-left:2px solid var(--accent);padding:4px 0 4px 20px;margin:0}
+.pq-demo .a{display:block;font-style:normal;font-family:var(--font-sans);font-size:11.5px;color:var(--ink-3);margin-top:10px}
+
+/* Actions dark box */
+.act-box{background:var(--ink);color:#F2EDE3;border-radius:10px;padding:18px 20px;width:100%}
+.act-box .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:0.12em;color:var(--ink-4);margin-bottom:10px}
+.act-box h2{font-family:var(--font-serif);font-size:18px;font-weight:400;margin:0 0 10px;color:#fff}
+.act-box .it{display:grid;grid-template-columns:22px 1fr auto;gap:10px;padding:10px 0;border-top:1px solid rgba(255,255,255,.12);align-items:start;font-size:13px;line-height:1.5}
+.act-box .it .n{font-family:var(--font-serif);font-size:17px;color:var(--accent);line-height:1;padding-top:2px}
+.act-box .it b{color:#fff;font-weight:500}
+.act-box .eff{font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-4);padding:3px 7px;border:1px solid rgba(255,255,255,.15);border-radius:999px}
+
+/* Delivery bar */
+.del-bar{display:flex;align-items:center;gap:14px;padding:12px 16px;border:1px solid var(--rule);border-radius:10px;font-size:13px;width:100%}
+.del-bar .dot{width:7px;height:7px;border-radius:50%;background:var(--positive);box-shadow:0 0 0 3px oklch(0.55 0.12 145 / .15)}
+.del-bar .d{font-size:12px;color:var(--ink-3)}
+
+/* Inputs */
+.search-in{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#fff;border:1px solid var(--rule);border-radius:999px;width:100%;color:var(--ink-3);font-size:13px}
+.search-in input{flex:1;background:none;border:none;outline:none;min-width:0;color:var(--ink)}
+
+/* Brand */
+.brand-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.logo-tile{border:1px solid var(--rule);border-radius:10px;padding:40px 24px;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.logo-tile .tk{font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:0.08em;text-transform:uppercase}
+.logo-tile.inv{background:var(--ink)}
+.logo-tile.inv .tk{color:var(--ink-4)}
+.logo-tile.acc{background:var(--accent-bg)}
+.logo-tile.acc .tk{color:var(--accent-ink)}
+
+.logo-lg{display:flex;align-items:center;gap:10px}
+.logo-lg .mk{width:32px;height:32px;background:var(--ink);border-radius:8px;display:grid;place-items:center;color:#fff}
+.logo-lg .mk::before{content:'';width:0;height:0;border-left:9px solid currentColor;border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:2px}
+.logo-lg .nm{font-family:var(--font-serif);font-size:24px;font-weight:500;letter-spacing:-0.015em}
+.logo-lg .nm em{font-style:italic;color:var(--ink-3);font-weight:400}
+
+.logo-tile.inv .mk{background:#fff;color:var(--ink)}
+.logo-tile.inv .nm{color:#fff}
+.logo-tile.inv .nm em{color:var(--ink-4)}
+.logo-tile.acc .mk{background:var(--ink)}
+
+/* Voice / tone */
+.voice{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.voice .v-card{border:1px solid var(--rule);border-radius:10px;padding:20px}
+.voice .v-card.do{border-color:var(--rule)}
+.voice .v-card.dont{border-color:var(--rule);opacity:.75}
+.voice .v-card .lab{display:inline-block;font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-bottom:10px}
+.voice .do .lab{background:oklch(0.93 0.08 145);color:oklch(0.32 0.1 145)}
+.voice .dont .lab{background:oklch(0.94 0.05 28);color:oklch(0.4 0.12 28)}
+.voice .v-card p{font-family:var(--font-serif);font-size:16px;line-height:1.5;margin:0}
+
+/* Foot */
+.foot{margin-top:80px;padding-top:24px;border-top:1px solid var(--rule);display:flex;gap:14px;color:var(--ink-3);font-size:12px;align-items:center}
+.foot .sp{flex:1}
+.foot a:hover{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- TOP -->
+  <div class="top">
+    <div class="mark"></div>
+    <div class="brand">Tubelet<em>.</em></div>
+    <span class="v">Design System · v0.1 · 2026.04</span>
+  </div>
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="eyebrow">Tubelet / Design System</div>
+    <h1 style="font-weight:700">매거진을 읽듯,<br/><em style="font-weight:500">하루를 시작해요.</em></h1>
+    <p class="lead">Tubelet은 구독한 유튜브 채널을 대신 읽고, 핵심 인사이트와 액션 아이템을 편집된 한 페이지로 정리해 보내주는 개인용 리더입니다. 이 문서는 그 감각을 유지하기 위한 최소한의 규칙입니다.</p>
+
+    <div class="meta-row">
+      <div><span class="k">Product</span><span class="v">Tubelet — YouTube Summary Reader</span></div>
+      <div><span class="k">Tone</span><span class="v">Editorial · Quiet · Personal</span></div>
+      <div><span class="k">Scale</span><span class="v">개인용 · 3 채널 기준</span></div>
+    </div>
+  </header>
+
+  <!-- 01 · TYPE -->
+  <section class="sec">
+    <div class="sec-hd">
+      <div class="num">01</div>
+      <h2>Type</h2>
+      <div class="desc">Newsreader로 내용을 읽고, Geist로 조작한다. Mono는 메타 정보와 시간.</div>
+    </div>
+
+    <div class="family-row">
+      <div class="family serif"><div class="fam-name">Pretendard · Display</div><div class="sample">Ag 에디토리얼</div><div class="aa"><span>400</span><span>500</span><span>600</span></div></div>
+      <div class="family sans"><div class="fam-name">Pretendard · Interface</div><div class="sample">Ag 인터페이스</div><div class="aa"><span>400</span><span>500</span><span>600</span></div></div>
+      <div class="family mono"><div class="fam-name">JetBrains Mono · Meta</div><div class="sample">00:00</div><div class="aa"><span>400</span><span>500</span></div></div>
+    </div>
+
+    <div class="type-scale">
+      <div class="type-row">
+        <div class="label"><b>Display</b>home hero</div>
+        <div><span class="t-display">더 나은 코드를 <em>만드는 법</em></span></div>
+        <div class="spec">Pretendard 600<br/>54 / 57 · -0.025em</div>
+      </div>
+      <div class="type-row">
+        <div class="label"><b>H1</b>greeting</div>
+        <div><span class="t-h1">좋은 아침이에요, 희진 님</span></div>
+        <div class="spec">Pretendard 600<br/>36 / 38 · -0.02em</div>
+      </div>
+      <div class="type-row">
+        <div class="label"><b>H2</b>section</div>
+        <div><span class="t-h2">핵심 인사이트</span></div>
+        <div class="spec">Pretendard 600<br/>24 / 29 · -0.015em</div>
+      </div>
+      <div class="type-row">
+        <div class="label"><b>Deck</b>summary lead</div>
+        <div><span class="t-deck">세 팀 모두 "AI가 쓴 코드를 그대로 머지하지 않는다"는 원칙에서 시작했다.</span></div>
+        <div class="spec">Pretendard 500<br/>19 / 28 · 1.5</div>
+      </div>
+      <div class="type-row">
+        <div class="label"><b>Body</b>article</div>
+        <div><span class="t-body">게스트들은 레버리지를 얻기 위해 팀 안에 의식적인 마찰을 남겨둬야 했다고 입을 모았다.</span></div>
+        <div class="spec">Pretendard 400<br/>17 / 28 · 1.65</div>
+      </div>
+      <div class="type-row">
+        <div class="label"><b>UI</b>button/input</div>
+        <div><span class="t-ui">받은 리포트 미리보기</span></div>
+        <div class="spec">Pretendard 500<br/>14 / 21 · 0</div>
+      </div>
+      <div class="type-row">
+        <div class="label"><b>Meta</b>caption</div>
+        <div><span class="t-meta">오전 7:38에 생성 · 3분 읽기</span></div>
+        <div class="spec">Pretendard 400<br/>12.5 / 19 · ink-3</div>
+      </div>
+      <div class="type-row">
+        <div class="label"><b>Label</b>section eyebrow</div>
+        <div><span class="t-label">오늘 도착 · 3편</span></div>
+        <div class="spec">Pretendard 500<br/>11 · +0.12em · UPPER</div>
+      </div>
+      <div class="type-row">
+        <div class="label"><b>Mono</b>timestamp</div>
+        <div><span class="t-mono">03:12:40 → 3분 읽기</span></div>
+        <div class="spec">JetBrains Mono 400<br/>12 · ink-2</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · COLORS -->
+  <section class="sec">
+    <div class="sec-hd">
+      <div class="num">02</div>
+      <h2>Colors</h2>
+      <div class="desc">흰 종이 위에 잉크 한 방울. 채도는 머스타드 액센트 하나로 제한한다.</div>
+    </div>
+
+    <div class="palette">
+      <div class="sw">
+        <div class="chip" style="background:#FFFFFF;border-bottom:1px solid var(--rule)"><div class="dot" style="background:#fff;border-color:var(--rule-strong)"></div></div>
+        <div class="txt">
+          <div class="nm">Paper</div>
+          <div class="hex"><span>#FFFFFF</span><span>--bg</span></div>
+          <div class="role">모든 페이지 바탕. 카드도 같은 흰색, 구분은 룰로만.</div>
+        </div>
+      </div>
+      <div class="sw">
+        <div class="chip" style="background:#F5F2EC"><div class="dot" style="background:#F5F2EC"></div></div>
+        <div class="txt">
+          <div class="nm">Tint</div>
+          <div class="hex"><span>#F5F2EC</span><span>--bg-tint</span></div>
+          <div class="role">미리보기 모달, 채널 카운트, 썸네일 플레이스홀더.</div>
+        </div>
+      </div>
+      <div class="sw">
+        <div class="chip" style="background:#1A1814"><div class="dot" style="background:#1A1814"></div></div>
+        <div class="txt">
+          <div class="nm">Ink</div>
+          <div class="hex"><span>#1A1814</span><span>--ink</span></div>
+          <div class="role">본문·제목 기본, Primary 버튼, Actions 다크 박스.</div>
+        </div>
+      </div>
+      <div class="sw">
+        <div class="chip" style="background:oklch(0.72 0.14 75)"><div class="dot" style="background:oklch(0.95 0.04 80)"></div></div>
+        <div class="txt">
+          <div class="nm">Mustard</div>
+          <div class="hex"><span>oklch(.72 .14 75)</span><span>--accent</span></div>
+          <div class="role">풀쿼트 세로선, AI 태그, Action 넘버. 채도는 여기만.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ink ramp -->
+    <div class="ramp">
+      <div class="step" style="background:#FFFFFF"><div class="lb">Paper</div><div class="hx">#FFFFFF</div><div class="nm" style="color:var(--ink)">bg</div></div>
+      <div class="step" style="background:#F5F2EC"><div class="lb">Tint</div><div class="hx">#F5F2EC</div><div class="nm" style="color:var(--ink)">bg-tint</div></div>
+      <div class="step" style="background:#EAE5DA"><div class="lb">Rule</div><div class="hx">#EAE5DA</div><div class="nm" style="color:var(--ink)">rule</div></div>
+      <div class="step" style="background:#B8B0A4"><div class="lb">Ink-4</div><div class="hx">#B8B0A4</div><div class="nm" style="color:#fff">disabled</div></div>
+      <div class="step" style="background:#8A847C"><div class="lb">Ink-3</div><div class="hx">#8A847C</div><div class="nm" style="color:#fff">meta</div></div>
+      <div class="step" style="background:#1A1814"><div class="lb" style="color:#8A847C">Ink</div><div class="hx" style="color:#B8B0A4">#1A1814</div><div class="nm" style="color:#fff">text</div></div>
+    </div>
+
+    <div class="t-label" style="margin-bottom:10px">Semantic</div>
+    <div class="semantic">
+      <div class="sem"><div class="bub" style="background:var(--positive)"></div><div><div class="nm">Positive · 전송 완료</div><div class="d">oklch(.55 .12 145) · 배송 성공 도트, "전송됨"</div></div></div>
+      <div class="sem"><div class="bub" style="background:var(--danger)"></div><div><div class="nm">Danger · 라이브/실패</div><div class="d">oklch(.58 .17 28) · 라이브 펄스, 오류 토스트</div></div></div>
+      <div class="sem"><div class="bub" style="background:var(--accent-bg);border:1px solid var(--accent);box-sizing:border-box"></div><div><div class="nm">Accent BG · AI 태그</div><div class="d">oklch(.95 .04 80) · "AI 요약" 칩 배경</div></div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px">
+      <div class="box" style="padding:18px;display:flex;gap:14px;align-items:center">
+        <div style="flex:1;font-size:12.5px;color:var(--ink-2)"><b style="color:var(--ink)">AA on Paper</b> — #1A1814 on #FFFFFF <br/><span style="color:var(--ink-3)">contrast 18.9 · pass AAA</span></div>
+        <div style="background:#fff;color:#1A1814;padding:10px 14px;border-radius:6px;border:1px solid var(--rule);font-weight:500">Aa</div>
+      </div>
+      <div class="box" style="padding:18px;display:flex;gap:14px;align-items:center">
+        <div style="flex:1;font-size:12.5px;color:var(--ink-2)"><b style="color:var(--ink)">AA on Ink</b> — #F2EDE3 on #1A1814 <br/><span style="color:var(--ink-3)">contrast 15.4 · pass AAA</span></div>
+        <div style="background:#1A1814;color:#F2EDE3;padding:10px 14px;border-radius:6px;font-weight:500">Aa</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 · SPACING / RADIUS -->
+  <section class="sec">
+    <div class="sec-hd">
+      <div class="num">03</div>
+      <h2>Spacing &amp; Shape</h2>
+      <div class="desc">4px 단위의 작은 스케일, 모서리는 세 가지로만.</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="box">
+        <h3 class="box-h">Spacing</h3>
+        <div class="box-sh">4px 기반 ramp · 섹션 간격은 32 이상</div>
+        <div class="space-row"><div class="bar" style="width:4px"></div><div class="tk"><b>space-1</b>4px · inline gap</div></div>
+        <div class="space-row"><div class="bar" style="width:8px"></div><div class="tk"><b>space-2</b>8px · chip gap</div></div>
+        <div class="space-row"><div class="bar" style="width:12px"></div><div class="tk"><b>space-3</b>12px · card padding inline</div></div>
+        <div class="space-row"><div class="bar" style="width:16px"></div><div class="tk"><b>space-4</b>16px · row gap</div></div>
+        <div class="space-row"><div class="bar" style="width:24px"></div><div class="tk"><b>space-6</b>24px · card padding</div></div>
+        <div class="space-row"><div class="bar" style="width:32px"></div><div class="tk"><b>space-8</b>32px · between blocks</div></div>
+        <div class="space-row"><div class="bar" style="width:56px"></div><div class="tk"><b>space-14</b>56px · between sections</div></div>
+      </div>
+
+      <div class="box">
+        <h3 class="box-h">Radius</h3>
+        <div class="box-sh">작은 UI는 6, 카드는 10, 모달·히어로는 14</div>
+        <div class="radius-row">
+          <div class="radius"><div class="shape" style="border-radius:0"></div><div class="nm">Square</div><div class="tk">0 · divider</div></div>
+          <div class="radius"><div class="shape" style="border-radius:6px"></div><div class="nm">Small</div><div class="tk">6 · button/input</div></div>
+          <div class="radius"><div class="shape" style="border-radius:10px"></div><div class="nm">Card</div><div class="tk">10 · cards</div></div>
+          <div class="radius"><div class="shape" style="border-radius:14px"></div><div class="nm">Sheet</div><div class="tk">14 · modal/bubble</div></div>
+          <div class="radius"><div class="shape" style="border-radius:999px"></div><div class="nm">Pill</div><div class="tk">∞ · chip/avatar</div></div>
+        </div>
+
+        <h3 class="box-h" style="margin-top:28px">Rule &amp; Elevation</h3>
+        <div class="box-sh">그림자는 거의 쓰지 않음 — 모달에만 허용</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div style="padding:12px 16px;border:1px solid var(--rule);border-radius:8px;font-size:12px"><b>1px rule</b> · #EAE5DA</div>
+          <div style="padding:12px 16px;border:1px solid var(--rule-strong);border-radius:8px;font-size:12px"><b>1px rule-strong</b> · #D6CEBE</div>
+          <div style="padding:12px 16px;border:1px solid var(--rule);border-radius:8px;font-size:12px;box-shadow:0 20px 60px -10px rgba(0,0,0,.2)"><b>Modal shadow</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · COMPONENTS -->
+  <section class="sec">
+    <div class="sec-hd">
+      <div class="num">04</div>
+      <h2>Components</h2>
+      <div class="desc">앱에서 실제로 쓰는 조각들. 세 가지 뷰로 충분하다.</div>
+    </div>
+
+    <div class="comp-grid">
+
+      <!-- Buttons -->
+      <div class="comp">
+        <div class="comp-hd"><h3>Button</h3><span class="tag">Primary / Outline / Ghost</span></div>
+        <div class="comp-body">
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn pri">받은 리포트 보기 →</button>
+            <button class="btn ol">채널 추가</button>
+            <button class="btn gh">설정</button>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn pri sm">전체 리포트 열기</button>
+            <button class="btn ol sm">미리보기</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chips -->
+      <div class="comp">
+        <div class="comp-hd"><h3>Chip</h3><span class="tag">Neutral / Accent / Live</span></div>
+        <div class="comp-body">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="chip">AI 엔지니어링</span>
+            <span class="chip">코드 리뷰</span>
+            <span class="chip accent">AI 요약</span>
+            <span class="chip live">LIVE · 녹화 중</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toggle + Input -->
+      <div class="comp">
+        <div class="comp-hd"><h3>Toggle</h3><span class="tag">On / Off</span></div>
+        <div class="comp-body">
+          <div style="display:flex;gap:14px;align-items:center">
+            <div class="toggle on"></div>
+            <span class="t-meta">이메일 알림</span>
+          </div>
+          <div style="display:flex;gap:14px;align-items:center">
+            <div class="toggle"></div>
+            <span class="t-meta">Notion 자동 정리</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-hd"><h3>Search Input</h3><span class="tag">Pill</span></div>
+        <div class="comp-body">
+          <div class="search-in">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+            <input placeholder="요약, 인사이트, 채널 검색…" />
+            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-4)">⌘K</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Channel chip -->
+      <div class="comp comp-wide">
+        <div class="comp-hd"><h3>Channel Chip</h3><span class="tag">구독 · 새글 카운트</span></div>
+        <div class="comp-body" style="align-items:flex-start">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="ch-chip"><span class="av" style="background:oklch(0.92 0.04 260);color:oklch(0.35 0.1 260)">a1</span>a16z Podcast <span class="cnt">2</span></span>
+            <span class="ch-chip"><span class="av" style="background:oklch(0.93 0.04 25);color:oklch(0.38 0.12 25)">LF</span>Lex Fridman <span class="cnt">1</span></span>
+            <span class="ch-chip"><span class="av" style="background:oklch(0.94 0.04 155);color:oklch(0.38 0.1 155)">최</span>최재천의 아마존 <span class="cnt">0</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery bar -->
+      <div class="comp comp-wide">
+        <div class="comp-hd"><h3>Delivery Status Bar</h3><span class="tag">자동 전송 상태</span></div>
+        <div class="comp-body">
+          <div class="del-bar">
+            <span class="dot"></span>
+            <div>
+              <div style="font-weight:500">자동 전송 작동 중</div>
+              <div class="d">새 영상 올라오면 이메일 + 메신저로 즉시 보냄</div>
+            </div>
+            <div style="flex:1"></div>
+            <button class="btn ol sm">미리보기</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary row -->
+      <div class="comp comp-wide">
+        <div class="comp-hd"><h3>Summary Row</h3><span class="tag">리스트 메인 카드</span></div>
+        <div class="comp-body" style="padding:18px 24px">
+          <div class="sum-row">
+            <div class="thumb"></div>
+            <div>
+              <div class="src">
+                <span style="width:16px;height:16px;border-radius:50%;background:oklch(0.92 0.04 260);color:oklch(0.35 0.1 260);display:inline-grid;place-items:center;font-family:var(--font-serif);font-size:10px;font-weight:600">a1</span>
+                <b>a16z Podcast</b> · 3시간 12분 → 3분
+              </div>
+              <h3 class="t">작은 팀이 AI로 더 나은 코드를 만드는 법</h3>
+              <p class="tldr">5명 팀 세 곳이 10배 속도 + 사고 절반을 얻기까지. "AI를 동료로 쓸지 도구로 쓸지" 먼저 정한다.</p>
+            </div>
+            <div class="meta">7:38<br/><span style="color:var(--positive);font-family:var(--font-sans);font-weight:500">● 전송됨</span></div>
+          </div>
+          <div class="sum-row">
+            <div class="thumb"></div>
+            <div>
+              <div class="src">
+                <span style="width:16px;height:16px;border-radius:50%;background:oklch(0.93 0.04 25);color:oklch(0.38 0.12 25);display:inline-grid;place-items:center;font-family:var(--font-serif);font-size:10px;font-weight:600">LF</span>
+                <b>Lex Fridman</b> · 4시간 07분 → 4분
+              </div>
+              <h3 class="t">양자컴퓨팅, 지금 믿어도 되는 3가지</h3>
+              <p class="tldr">Scott Aaronson이 3시간 걸쳐 분리한 하이프와 현실. 2026년 기준 실용 과제가 어디까지 왔나.</p>
+            </div>
+            <div class="meta">6:02<br/><span style="color:var(--positive);font-family:var(--font-sans);font-weight:500">● 전송됨</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insight -->
+      <div class="comp">
+        <div class="comp-hd"><h3>Insight Card</h3><span class="tag">상세 본문</span></div>
+        <div class="comp-body">
+          <div class="ins-card">
+            <div class="n">Insight 02</div>
+            <h4>AI 리뷰어는 '1순위 독자'</h4>
+            <p>사람보다 먼저 AI가 보게 하면 저품질 PR이 자체 회수된다.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pull quote -->
+      <div class="comp">
+        <div class="comp-hd"><h3>Pull Quote</h3><span class="tag">액센트 세로선</span></div>
+        <div class="comp-body">
+          <aside class="pq-demo">
+            "AI 없이도 그 코드를 쓸 수 있었는가?"
+            <span class="a">Jessica Kerr · 40:12</span>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Actions box -->
+      <div class="comp comp-wide">
+        <div class="comp-hd"><h3>Actions Box</h3><span class="tag">다크 섹션 · 실행 아이템</span></div>
+        <div class="comp-body" style="padding:20px 24px">
+          <div class="act-box">
+            <div class="lab">당신을 위한 액션 · 4개</div>
+            <h2>오늘 바로 실행할 수 있는 것들</h2>
+            <div class="it"><div class="n">01</div><div><b>PR 템플릿에 "AI 사용 섹션" 추가.</b> 리뷰어가 집중할 곳이 드러난다.</div><div class="eff">15분</div></div>
+            <div class="it"><div class="n">02</div><div><b>리뷰 봇 프롬프트 커스터마이즈.</b> 기본 프롬프트는 소음을 낸다.</div><div class="eff">1시간</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · BRAND -->
+  <section class="sec">
+    <div class="sec-hd">
+      <div class="num">05</div>
+      <h2>Brand</h2>
+      <div class="desc">로고는 삼각형 재생 하나. 이름은 마침표 포함이 공식이다.</div>
+    </div>
+
+    <div class="brand-grid">
+      <div class="logo-tile">
+        <div class="logo-lg"><div class="mk"></div><div class="nm">Tubelet<em>.</em></div></div>
+        <div class="tk">Primary · on paper</div>
+      </div>
+      <div class="logo-tile inv">
+        <div class="logo-lg"><div class="mk"></div><div class="nm">Tubelet<em>.</em></div></div>
+        <div class="tk">Inverse · on ink</div>
+      </div>
+      <div class="logo-tile acc">
+        <div class="logo-lg"><div class="mk"></div><div class="nm">Tubelet<em>.</em></div></div>
+        <div class="tk">Accent · AI surface</div>
+      </div>
+    </div>
+
+    <div style="margin-top:40px">
+      <div class="t-label" style="margin-bottom:12px">Voice &amp; Tone · 말투</div>
+      <div class="voice">
+        <div class="v-card do">
+          <span class="lab">DO · 이렇게</span>
+          <p>"어젯밤부터 3편의 새 영상이 올라왔고, 모두 정리해서 보내드렸어요."</p>
+        </div>
+        <div class="v-card dont">
+          <span class="lab">DON'T · 이렇게는 말고</span>
+          <p>"🚀 와우! 무려 3개의 새로운 컨텐츠가 업로드되었습니다!!"</p>
+        </div>
+        <div class="v-card do">
+          <span class="lab">DO · 이렇게</span>
+          <p>"5명 팀 세 곳이 10배 속도 + 사고 절반을 얻기까지."</p>
+        </div>
+        <div class="v-card dont">
+          <span class="lab">DON'T · 이렇게는 말고</span>
+          <p>"이 영상을 통해 얻을 수 있는 다양한 인사이트들을 확인해 보세요."</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:40px">
+      <div class="t-label" style="margin-bottom:12px">원칙 · 4가지</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="box"><h3 class="box-h">01 · 흰 종이 먼저</h3><p style="margin:8px 0 0;color:var(--ink-2);font-size:13px;line-height:1.55">배경은 순백. 카드도 흰색. 구분은 얇은 룰 한 줄로만. 음영과 그림자는 쓰지 않는다.</p></div>
+        <div class="box"><h3 class="box-h">02 · 읽는 감각</h3><p style="margin:8px 0 0;color:var(--ink-2);font-size:13px;line-height:1.55">본문은 Serif. 줄간격 1.65. 드롭캡 한 번, 풀쿼트 한 번 — 에디토리얼의 리듬을 지킨다.</p></div>
+        <div class="box"><h3 class="box-h">03 · 잉크 한 방울</h3><p style="margin:8px 0 0;color:var(--ink-2);font-size:13px;line-height:1.55">채도는 머스타드 하나로. 풀쿼트 세로선, AI 태그, 다크 박스의 넘버에만 허용한다.</p></div>
+        <div class="box"><h3 class="box-h">04 · 조용한 데이터</h3><p style="margin:8px 0 0;color:var(--ink-2);font-size:13px;line-height:1.55">숫자와 통계는 꼭 필요한 것만. 아이콘 남발 금지. 시간은 Mono, 나머지는 자연어.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOT -->
+  <footer class="foot">
+    <span>Tubelet Design System · v0.1</span>
+    <span>·</span>
+    <span>2026.04.18</span>
+    <div class="sp"></div>
+    <a href="index.html">앱 보러가기 →</a>
+  </footer>
+
+</div>
+</body>
+</html>

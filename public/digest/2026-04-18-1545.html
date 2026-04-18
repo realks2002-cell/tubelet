@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tubelet · 2026.04.18 (토)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+
+:root {
+  --bg: #FFFFFF;
+  --bg-tint: #F5F2EC;
+  --ink: #1A1814;
+  --ink-2: #4A4540;
+  --ink-3: #8A847C;
+  --ink-4: #B8B0A4;
+  --rule: #EAE5DA;
+  --rule-strong: #D6CEBE;
+  --accent: oklch(0.72 0.14 75);
+  --accent-ink: oklch(0.32 0.10 60);
+  --accent-bg: oklch(0.95 0.04 80);
+  --positive: oklch(0.55 0.12 145);
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); }
+body {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+.page { max-width: 780px; margin: 0 auto; padding: 56px 40px 120px; }
+
+/* ─── Top bar ─── */
+.top { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+.mark {
+  width: 26px; height: 26px; background: var(--ink);
+  border-radius: 7px; display: inline-grid; place-items: center;
+  color: #fff; align-self: center;
+}
+.mark::before {
+  content: '';
+  width: 0; height: 0;
+  border-left: 7px solid currentColor;
+  border-top: 4.5px solid transparent;
+  border-bottom: 4.5px solid transparent;
+  margin-left: 2px;
+}
+.brand {
+  font-family: var(--font-sans); font-size: 20px;
+  font-weight: 600; letter-spacing: -0.01em;
+}
+.brand em { font-style: italic; color: var(--ink-3); font-weight: 400; }
+.top .v {
+  margin-left: auto; font-family: var(--font-mono);
+  font-size: 11px; color: var(--ink-3); letter-spacing: 0.05em;
+}
+
+/* ─── Masthead ─── */
+.masthead {
+  margin: 28px 0 64px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--rule);
+}
+.eyebrow {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.masthead h1 {
+  font-family: var(--font-sans); font-size: 60px; font-weight: 700;
+  letter-spacing: -0.03em; line-height: 1;
+  margin: 14px 0 14px; text-wrap: balance;
+}
+.masthead h1 em { font-style: italic; color: var(--ink-3); font-weight: 500; }
+.masthead .lead {
+  font-family: var(--font-sans); font-size: 19px; font-weight: 500;
+  line-height: 1.5; color: var(--ink-2);
+  max-width: 620px; text-wrap: pretty; margin: 0;
+}
+.meta-row {
+  display: flex; gap: 32px; margin-top: 28px;
+  font-size: 12.5px; color: var(--ink-3); flex-wrap: wrap;
+}
+.meta-row .k {
+  display: block; font-family: var(--font-mono);
+  font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.meta-row .v { color: var(--ink); font-size: 13px; font-weight: 500; }
+
+/* ─── Article ─── */
+.article {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.article:last-of-type { border-bottom: none; }
+
+.art-meta {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 12px; color: var(--ink-3); margin-bottom: 18px;
+}
+.art-num {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--ink-3); text-transform: uppercase;
+  padding: 2px 8px; border: 1px solid var(--rule); border-radius: 4px;
+}
+.art-channel { font-weight: 500; color: var(--ink-2); }
+.sep { color: var(--ink-4); }
+.mono { font-family: var(--font-mono); }
+
+.art-headline {
+  font-family: var(--font-sans); font-size: 36px; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.1;
+  margin: 0 0 14px; text-wrap: balance;
+}
+
+.art-deck {
+  font-family: var(--font-sans); font-size: 19px; font-weight: 500;
+  line-height: 1.5; color: var(--ink-2);
+  margin: 0 0 32px; text-wrap: pretty;
+}
+
+.art-thumb {
+  display: block; margin: 0 0 32px;
+  border: 1px solid var(--rule); border-radius: 10px; overflow: hidden;
+  background: var(--bg-tint);
+}
+.art-thumb img {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover;
+  border-bottom: 1px solid var(--rule);
+}
+.art-thumb-caption {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 12px 16px;
+  background: #fff;
+}
+.art-thumb-caption .mono {
+  font-size: 10.5px; color: var(--ink-3);
+  letter-spacing: 0.08em; text-transform: uppercase; flex-shrink: 0;
+}
+.art-thumb-title {
+  font-size: 13px; color: var(--ink-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 1; min-width: 0;
+}
+.art-thumb:hover .art-thumb-title { color: var(--ink); }
+
+/* Actions box (dark) */
+.act-box {
+  background: var(--ink); color: #F2EDE3;
+  border-radius: 10px; padding: 24px 26px;
+  margin: 0 0 28px;
+}
+.act-box .lab {
+  font-size: 10.5px; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--ink-4); margin-bottom: 8px;
+}
+.act-box h3 {
+  font-family: var(--font-sans); font-size: 18px; font-weight: 500;
+  margin: 0 0 14px; color: #fff; letter-spacing: -0.01em;
+}
+.act-box .it {
+  display: grid; grid-template-columns: 28px 1fr; gap: 14px;
+  padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.12);
+  align-items: start; font-size: 14px; line-height: 1.55;
+}
+.act-box .it:first-of-type { border-top: none; padding-top: 2px; }
+.act-box .it .n {
+  font-family: var(--font-sans); font-size: 17px; font-weight: 600;
+  color: var(--accent); line-height: 1; padding-top: 3px;
+  letter-spacing: -0.01em;
+}
+
+/* Chips row */
+.chips-row {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin: 0 0 28px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; padding: 3px 10px; border-radius: 999px;
+  background: var(--bg-tint); color: var(--ink-2); font-weight: 500;
+}
+.chip.accent { background: var(--accent-bg); color: var(--accent-ink); }
+
+/* CTA */
+.art-cta { display: flex; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 6px;
+  font-size: 13px; font-weight: 500; border: 1px solid transparent;
+  transition: all .12s;
+}
+.btn.ol {
+  border-color: var(--rule-strong); color: var(--ink); background: #fff;
+}
+.btn.ol:hover { background: var(--bg-tint); }
+
+/* Empty state */
+.empty {
+  padding: 80px 0; text-align: center; border-bottom: 1px solid var(--rule);
+}
+.empty .t-label {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  color: var(--ink-3); text-transform: uppercase; margin: 0 0 12px;
+}
+.empty h2 {
+  font-family: var(--font-sans); font-size: 28px; font-weight: 600;
+  letter-spacing: -0.02em; margin: 0 0 10px;
+}
+.empty p { color: var(--ink-3); font-size: 14px; margin: 0; }
+
+/* Footer */
+.foot {
+  margin-top: 80px; padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  display: flex; gap: 14px; color: var(--ink-3);
+  font-size: 12px; align-items: center;
+}
+.foot .sp { flex: 1; }
+.foot .mono { font-family: var(--font-mono); font-size: 11px; }
+
+/* ─── Mobile ─── */
+@media (max-width: 560px) {
+  .page { padding: 36px 20px 80px; }
+  .masthead h1 { font-size: 44px; }
+  .masthead .lead { font-size: 17px; }
+  .meta-row { gap: 20px; }
+  .article { padding: 48px 0; }
+  .art-headline { font-size: 28px; }
+  .art-deck { font-size: 17px; margin-bottom: 24px; }
+  .act-box { padding: 20px; }
+  .act-box .it { grid-template-columns: 24px 1fr; gap: 10px; }
+}
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <div class="mark" aria-hidden="true"></div>
+    <div class="brand">Tubelet<em>.</em></div>
+    <span class="v">Daily Digest · 2026.04.18 (토) · 15:45</span>
+  </div>
+
+  <header class="masthead">
+    <div class="eyebrow">Tubelet / Daily Digest</div>
+    <h1>오늘의 <em>이야기</em></h1>
+    <p class="lead">염블리와 함께 [LS증권] 채널에서 2편이 올라왔고, 모두 정리해서 담았어요.</p>
+    <div class="meta-row">
+      <div><span class="k">Videos</span><span class="v">2편</span></div>
+      <div><span class="k">Channels</span><span class="v">염블리와 함께 [LS증권]</span></div>
+      <div><span class="k">Generated</span><span class="v">Claude Haiku 4.5</span></div>
+    </div>
+  </header>
+
+  <article class="article">
+
+  <div class="art-meta">
+    <span class="art-num">01</span>
+    <span class="art-channel">염블리와 함께 [LS증권]</span>
+    <span class="sep">·</span><span class="mono">2026.04.18 (토) 10:00</span>
+    <span class="sep">·</span>
+    <span class="mono">자막 기반</span>
+  </div>
+
+  <h2 class="art-headline">LNG 산업의 병목 분석과 투자 기회</h2>
+
+  <p class="art-deck">중동 지정학적 리스크로 인한 LNG 공급 차질을 배경으로, 전 세계적 LNG 공급 부족 현상을 분석합니다. 미국 LNG 수출 증가, 알레스카 개발 가능성, LNG 운반선 수주 급증 등을 통해 조선·화공 기업들의 수익 기회를 설명하고, 삼성중공업, 한국화학, SNT에너지 등 관련 기업들의 역할을 구체적으로 소개합니다.</p>
+
+  <a class="art-thumb" href="https://www.youtube.com/watch?v=70tGLxZYEyc" target="_blank" rel="noopener">
+    <img src="https://i.ytimg.com/vi/70tGLxZYEyc/hqdefault.jpg" alt="" />
+    <div class="art-thumb-caption">
+      <span class="mono">원본 제목</span>
+      <span class="art-thumb-title">[함께배우기] 282일차, 병목(Bottleneck) Part5. 조선-LNG(LNG운반선, 보냉재, 에어쿨러, 피팅, 발전소)</span>
+    </div>
+  </a>
+
+  <div class="act-box">
+    <div class="lab">핵심 포인트 · 6개</div>
+    <h3>이 영상의 요점</h3>
+    <div class="it"><div class="n">01</div><div>호르무즈 해협 폐쇄로 카타르 LNG 수출 17% 감소, 미국이 대체 공급국으로 부상</div></div><div class="it"><div class="n">02</div><div>2029-2030년 LNG 운반선 280척 이상 필요, 연간 70-90척 수주 급증 예상</div></div><div class="it"><div class="n">03</div><div>삼성중공업의 FLNG와 LNG 운반선, 한국화학의 보냉재(트리플X), SNT에너지의 에어쿨러가 핵심 부품</div></div><div class="it"><div class="n">04</div><div>미국 LNG 프로젝트 10조 원대 규모, 삼성ENG가 인도네시아 LNG 플랜트 개념설계 수주</div></div><div class="it"><div class="n">05</div><div>LNG 밸류체인(액화-운송-저장-기화-발전) 전 단계에서 한국 기업 강점 보유</div></div><div class="it"><div class="n">06</div><div>피팅, 보냉재 등 핵심 부품의 기술적 진입장벽 높아 관련 기업 수혜 가능</div></div>
+  </div>
+
+  <div class="chips-row">
+    <span class="chip accent">AI 요약</span>
+    <span class="chip">LNG 운반선</span><span class="chip">조선 산업</span><span class="chip">에너지 공급망</span><span class="chip">지정학적 리스크</span>
+  </div>
+
+  <div class="art-cta">
+    <a class="btn ol" href="https://www.youtube.com/watch?v=70tGLxZYEyc" target="_blank" rel="noopener">
+      YouTube에서 영상 보기
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h8v8"/><path d="M13 3L3 13"/></svg>
+    </a>
+  </div>
+
+</article>
+<article class="article">
+
+  <div class="art-meta">
+    <span class="art-num">02</span>
+    <span class="art-channel">염블리와 함께 [LS증권]</span>
+    <span class="sep">·</span><span class="mono">2026.04.17 (금) 18:00</span>
+    <span class="sep">·</span>
+    <span class="mono">자막 기반</span>
+  </div>
+
+  <h2 class="art-headline">리튬 급등, K9 자주포 밸류체인 분석</h2>
+
+  <p class="art-deck">4월 17일 코스피는 이전 랠리 후 적절한 조정을 받으며 휴식을 취했고, 코스닥은 강세를 유지했습니다. 글로벌 최대 리튬 채산지인 앨범말의 주가가 16% 급등하며 포스코홀딩스 등 2차전지 관련주를 견인했습니다. K9 자주포는 세계 점유율 50% 이상으로 STX엔진, SNT다이나믹스, 현대위아 등 국내 방산 밸류체인을 구성하고 있으며, 선박 엔진이 데이터센터 전력공급용으로 활용되면서 관련 주식들이 상한가를 기록했습니다.</p>
+
+  <a class="art-thumb" href="https://www.youtube.com/watch?v=YGPtDTVLBRI" target="_blank" rel="noopener">
+    <img src="https://i.ytimg.com/vi/YGPtDTVLBRI/hqdefault.jpg" alt="" />
+    <div class="art-thumb-caption">
+      <span class="mono">원본 제목</span>
+      <span class="art-thumb-title">[시장함께읽기] 4월 17일, 랠리 후 코스피 잠시 휴식, 코스닥은 쉴 틈이 없었다(리튬, K9 자주포 밸류체인, 선박엔진, 코스피 8500, 반도체, 원전)</span>
+    </div>
+  </a>
+
+  <div class="act-box">
+    <div class="lab">핵심 포인트 · 6개</div>
+    <h3>이 영상의 요점</h3>
+    <div class="it"><div class="n">01</div><div>앨범말 주가 16% 급등으로 리튬 수요 전망치 상향, 배터리용 탄산리튬 가격 상승세 지속</div></div><div class="it"><div class="n">02</div><div>K9 자주포는 세계 최고 성능과 저가격(독일제 70억 대비 220억)으로 폴란드·핀란드 등 글로벌 수출 증가</div></div><div class="it"><div class="n">03</div><div>STX엔진이 K9 자주포 파워팩 엔진을 국산화하며 해외 수출 제약 해결</div></div><div class="it"><div class="n">04</div><div>JP모건이 코스피 목표지수를 8,500으로 상향 조정, 기술주와 반도체 주도의 회복장 지속 전망</div></div><div class="it"><div class="n">05</div><div>선박 엔진 기업들이 데이터센터 전력공급 시장 진출로 신규 수익원 창출</div></div><div class="it"><div class="n">06</div><div>TSMC 호실적에도 투자 부담으로 주가 하락, 삼성전자·하이닉스는 실적 대비 저평가 상태</div></div>
+  </div>
+
+  <div class="chips-row">
+    <span class="chip accent">AI 요약</span>
+    <span class="chip">리튬·배터리</span><span class="chip">방산·K9자주포</span><span class="chip">반도체</span><span class="chip">선박·데이터센터</span>
+  </div>
+
+  <div class="art-cta">
+    <a class="btn ol" href="https://www.youtube.com/watch?v=YGPtDTVLBRI" target="_blank" rel="noopener">
+      YouTube에서 영상 보기
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h8v8"/><path d="M13 3L3 13"/></svg>
+    </a>
+  </div>
+
+</article>
+
+  <footer class="foot">
+    <span>Tubelet · Personal Digest</span>
+    <span>·</span>
+    <span>2026.04.18 (토)</span>
+    <div class="sp"></div>
+    <span class="mono">v0.1</span>
+  </footer>
+
+</div>
+</body>
+</html>

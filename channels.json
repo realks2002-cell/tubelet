@@ -1,0 +1,19 @@
+{
+  "channels": [
+    {
+      "id": "UChZFFQS6ThJ_VmuE-Yzao8Q",
+      "name": "주덕",
+      "enabled": true
+    },
+    {
+      "id": "UCDnIfMiHBNs1RP7y6B6wf1Q",
+      "name": "염블리와 함께 [LS증권]",
+      "enabled": true
+    },
+    {
+      "id": "UChlv4GSd7OQl3js-jkLOnFA",
+      "name": "삼프로TV 3PROTV",
+      "enabled": true
+    }
+  ]
+}
