@@ -6,6 +6,7 @@ import { summarizeVideo } from "./summarize.js";
 import { renderDigest, type DigestItem } from "./html.js";
 import { regenerateLanding } from "./landing.js";
 import type { DigestMeta } from "./save.js";
+import { isKakaoConfigured, sendDigestToKakao } from "./kakao.js";
 
 export interface SoloResult {
   slug: string;
@@ -57,6 +58,17 @@ export async function summarizeSingleUrl(url: string): Promise<SoloResult> {
   await writeFile(metaPath, JSON.stringify(meta, null, 2), "utf8");
 
   await regenerateLanding();
+
+  if (isKakaoConfigured()) {
+    try {
+      const siteBase = process.env.SITE_URL ?? `http://localhost:3000`;
+      const digestUrl = `${siteBase}/digest/${slug}.html`;
+      await sendDigestToKakao(digest, digestUrl);
+      console.log(`  ✓ 카톡 전송 완료`);
+    } catch (err) {
+      console.error(`  ✗ 카카오 전송 실패:`, (err as Error).message);
+    }
+  }
 
   return {
     slug,

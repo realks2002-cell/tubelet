@@ -7,6 +7,7 @@ import { summarizeVideo } from "./summarize.js";
 import { renderDigest, type DigestItem } from "./html.js";
 import { saveDigestHtml } from "./save.js";
 import { regenerateLanding } from "./landing.js";
+import { isKakaoConfigured, sendDigestToKakao } from "./kakao.js";
 
 const MAX_AGE_HOURS = 24;
 
@@ -79,6 +80,17 @@ async function main() {
 
   const landingPath = await regenerateLanding();
   console.log(`✓ 랜딩페이지 재생성: ${landingPath}`);
+
+  if (isKakaoConfigured()) {
+    try {
+      const siteBase = process.env.SITE_URL ?? `http://localhost:3000`;
+      const digestUrl = `${siteBase}/digest/${saved.slug}.html`;
+      await sendDigestToKakao(digest, digestUrl);
+      console.log(`✓ 카카오 나에게 보내기 완료`);
+    } catch (err) {
+      console.error(`✗ 카카오 전송 실패:`, (err as Error).message);
+    }
+  }
 
   const updated = markSeen(
     state,

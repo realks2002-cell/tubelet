@@ -1,0 +1,47 @@
+name: Tubelet Daily Digest
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Run Tubelet digest pipeline
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: npm run dev
+
+      - name: Commit digests
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "tubelet-bot"
+          git add public/ state/last-checked.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: $(date -u +'%Y-%m-%d %H:%MZ') 자동 다이제스트"
+            git push
+          else
+            echo "변경사항 없음 — skip"
+          fi

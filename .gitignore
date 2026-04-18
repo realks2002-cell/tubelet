@@ -2,6 +2,7 @@ node_modules/
 dist/
 .env
 .env.local
-state/
+state/kakao-token.json
 *.log
 .DS_Store
+.vercel
