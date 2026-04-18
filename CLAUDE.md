@@ -1,11 +1,53 @@
 # Youtube_sum — Tubelet
 
-구독한 YouTube 채널의 새 영상을 자동으로 요약해서 이메일과 카카오톡으로 보내주는 개인용 스크립트.
+구독한 YouTube 채널의 새 영상을 자동으로 요약해서 카카오톡으로 보내주는 개인용 앱.
+
+## 🔗 배포
+
+- **프로덕션**: https://tubelet.vercel.app
+- **GitHub**: https://github.com/realks2002-cell/tubelet
+- **호스팅**: Vercel (정적 호스팅, public/ 서빙)
+- **자동화**: GitHub Actions cron (`.github/workflows/digest.yml`) — 매시간 정각 자동 실행
+- **소유자 계정**: realks2002@gmail.com (앱 ID 1434755 / 카카오 개발자)
+
+### 배포 흐름
+
+```
+로컬 npm run dev
+        │
+        ├─ public/digest/*.html, state/last-checked.json 생성
+        │
+        └─ git commit + push
+              │
+              └─ Vercel 자동 재배포 → https://tubelet.vercel.app 갱신
+              └─ 카카오톡 '나와의 채팅' 발송
+
+GitHub Actions cron (매시간)
+        │
+        └─ npm run dev → 자동 커밋 → Vercel 재배포 + 카톡 발송
+```
+
+### Vercel 환경 설정
+- `vercel.json`: `outputDirectory: "public"`, `framework: null`, `cleanUrls: true`
+- 빌드 커맨드 없음 (순수 정적)
+
+### 환경 변수 (GitHub Secrets)
+Actions 실행을 위해 레포 Secrets에 등록:
+- `YOUTUBE_API_KEY`
+- `ANTHROPIC_API_KEY`
+- `KAKAO_REST_API_KEY`
+- `KAKAO_CLIENT_SECRET`
+- `KAKAO_REFRESH_TOKEN`
+- `SITE_URL` = `https://tubelet.vercel.app`
+
+### 카카오 Redirect URI 등록 (두 개 모두 등록 필수)
+- `http://localhost:3000/auth/kakao/callback` (로컬 개발)
+- `https://tubelet.vercel.app/auth/kakao/callback` (Vercel 배포)
 
 ## 프로젝트 개요
 - 언어: TypeScript + Node.js (ESM)
-- 실행: `npm run dev` (로컬), GitHub Actions cron (프로덕션)
-- 파이프라인: YouTube Data API → 자막 추출 → Claude 요약 → HTML 다이제스트 → 이메일/카톡 발송
+- 실행: `npm run dev` (로컬 cron), `npm run serve` (URL 즉석 요약 웹서버), GitHub Actions cron (프로덕션)
+- 파이프라인: YouTube Data API → 자막 추출 → Claude 요약 (Haiku 4.5) → HTML 다이제스트 → 카톡 발송
 
 ## 디자인 시스템 · Tubelet
 
