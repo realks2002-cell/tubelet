@@ -1,9 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "outputDirectory": "public",
   "framework": null,
-  "buildCommand": "npx tsx scripts/build-pages.ts",
   "cleanUrls": true,
+  "rewrites": [
+    { "source": "/digest/:slug", "destination": "/api/page-digest?slug=:slug" },
+    { "source": "/channel/:slug", "destination": "/api/page-channel?slug=:slug" },
+    { "source": "/video/:id", "destination": "/api/page-video?id=:id" },
+    { "source": "/", "destination": "/api/page-landing" }
+  ],
   "functions": {
     "api/**/*.ts": {
       "maxDuration": 60

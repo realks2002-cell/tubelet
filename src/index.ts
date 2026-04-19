@@ -76,8 +76,7 @@ async function main() {
 
   const html = renderDigest(digest);
   const saved = await saveDigestHtml(html, digest);
-  console.log(`\n✓ HTML 다이제스트 저장: ${saved.filePath}`);
-  console.log(`  슬러그: ${saved.slug}`);
+  console.log(`\n✓ 다이제스트 Supabase 저장: ${saved.slug}`);
 
   const landingPath = await regenerateLanding();
   console.log(`✓ 랜딩페이지 재생성: ${landingPath}`);

@@ -2,17 +2,13 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { extractVideoId, fetchVideoById } from "../src/youtube.js";
 import { fetchTranscript } from "../src/transcript.js";
 import { summarizeVideo } from "../src/summarize.js";
-import { renderDigest, type DigestItem } from "../src/html.js";
+import type { DigestItem } from "../src/html.js";
 import { isKakaoConfigured, sendDigestToKakao } from "../src/kakao.js";
-import { commitFiles, requireGitHubEnv } from "../src/github.js";
-import type { DigestMeta } from "../src/save.js";
+import { db } from "../src/db.js";
 
 export const maxDuration = 60;
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse,
-) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
     res.status(405).json({ error: "POST 메서드만 허용됩니다." });
     return;
@@ -29,58 +25,48 @@ export default async function handler(
 
   const videoId = extractVideoId(url);
   if (!videoId) {
-    res
-      .status(400)
-      .json({ error: "유효한 YouTube URL 또는 videoId가 아닙니다." });
+    res.status(400).json({ error: "유효한 YouTube URL 또는 videoId가 아닙니다." });
     return;
   }
 
   try {
     console.log(`[api/summarize] ${videoId}`);
-    const gh = requireGitHubEnv();
 
     const video = await fetchVideoById(videoId);
     const transcript = await fetchTranscript(videoId);
     const summary = await summarizeVideo(video, transcript);
 
-    const digest: DigestItem[] = [
-      { video, summary, hadTranscript: transcript !== null },
-    ];
-    const html = renderDigest(digest);
+    const digest: DigestItem[] = [{ video, summary, hadTranscript: transcript !== null }];
 
     const now = new Date();
     const slug = `solo-${toSlug(now)}-${videoId}`;
 
-    const meta: DigestMeta = {
-      slug,
-      generatedAt: now.toISOString(),
-      videoCount: 1,
-      channels: [video.channelName],
-      headlines: [
-        {
-          channelName: video.channelName,
-          headline: summary.headline,
-          videoTitle: video.title,
-          videoId,
-          stockCount: summary.stocks.length,
-        },
-      ],
-    };
+    const { error: vErr } = await db.from("tube_videos").upsert({
+      video_id: videoId,
+      channel_id: video.channelId || null,
+      channel_name: video.channelName,
+      video_title: video.title,
+      published_at: video.publishedAt ?? null,
+      headline: summary.headline,
+      deck: summary.summary,
+      tldr: summary.keyPoints.map((text, i) => ({ num: i + 1, text })),
+      actions: summary.keyPoints.map((text, i) => ({ num: i + 1, text })),
+      stocks: summary.stocks,
+      chips: summary.topics ?? [],
+      had_transcript: transcript !== null,
+      generated_at: now.toISOString(),
+    }, { onConflict: "video_id" });
+    if (vErr) throw new Error(`tube_videos 저장 실패: ${vErr.message}`);
 
-    await commitFiles({
-      ...gh,
-      files: [
-        { path: `public/digest/${slug}.html`, content: html },
-        {
-          path: `public/digest/${slug}.json`,
-          content: JSON.stringify(meta, null, 2) + "\n",
-        },
-      ],
-      message: `feat: Compose 요약 ${summary.headline}`,
-    });
+    const { error: rErr } = await db.from("tube_digest_runs").upsert({
+      slug,
+      generated_at: now.toISOString(),
+      video_ids: [videoId],
+    }, { onConflict: "slug" });
+    if (rErr) throw new Error(`tube_digest_runs 저장 실패: ${rErr.message}`);
 
     const siteBase = process.env.SITE_URL ?? "https://tubelet.vercel.app";
-    const digestUrl = `${siteBase}/digest/${slug}.html`;
+    const digestUrl = `${siteBase}/digest/${slug}`;
 
     let kakaoSent = false;
     let kakaoError: string | null = null;
@@ -104,7 +90,7 @@ export default async function handler(
       stockCount: summary.stocks.length,
       kakaoSent,
       kakaoError,
-      note: "GitHub 커밋 완료. Vercel 재배포 후 1~2분 뒤 URL에 접근 가능합니다.",
+      note: "Supabase 저장 완료. 바로 접근 가능합니다.",
     });
   } catch (err) {
     const msg = (err as Error).message;

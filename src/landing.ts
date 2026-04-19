@@ -1,11 +1,10 @@
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { DigestMeta } from "./save.js";
+import { db } from "./db.js";
+import { loadAllMetas, type DigestMeta } from "./save.js";
 import { channelSlug, regenerateChannelPages } from "./channel-pages.js";
 
-const DIGEST_DIR = resolve("public/digest");
 const INDEX_PATH = resolve("public/index.html");
-const CHANNELS_PATH = resolve("channels.json");
 
 interface ActiveChannel {
   id: string;
@@ -23,7 +22,7 @@ interface ChannelSummary {
 }
 
 export async function regenerateLanding(): Promise<string> {
-  const metas = await loadAllMeta();
+  const metas = await loadAllMetas();
   metas.sort((a, b) => (a.slug < b.slug ? 1 : -1));
 
   const activeChannels = await loadActiveChannels();
@@ -34,17 +33,12 @@ export async function regenerateLanding(): Promise<string> {
 }
 
 async function loadActiveChannels(): Promise<ActiveChannel[]> {
-  try {
-    const raw = await readFile(CHANNELS_PATH, "utf8");
-    const data = JSON.parse(raw) as {
-      channels?: Array<{ id: string; name: string; enabled?: boolean }>;
-    };
-    return (data.channels ?? [])
-      .filter((c) => c.enabled !== false)
-      .map((c) => ({ id: c.id, name: c.name }));
-  } catch {
-    return [];
-  }
+  const { data, error } = await db
+    .from("tube_channels")
+    .select("id, name")
+    .eq("enabled", true);
+  if (error) throw new Error(`tube_channels 조회 실패: ${error.message}`);
+  return (data ?? []) as ActiveChannel[];
 }
 
 function aggregateChannels(metas: DigestMeta[]): ChannelSummary[] {
@@ -75,55 +69,6 @@ function aggregateChannels(metas: DigestMeta[]): ChannelSummary[] {
   );
 }
 
-async function loadAllMeta(): Promise<DigestMeta[]> {
-  const files = await readdir(DIGEST_DIR).catch(() => [] as string[]);
-  const metas: DigestMeta[] = [];
-
-  for (const file of files) {
-    if (file.endsWith(".json")) {
-      try {
-        const raw = await readFile(resolve(DIGEST_DIR, file), "utf8");
-        metas.push(JSON.parse(raw) as DigestMeta);
-      } catch {
-        // 깨진 meta는 무시
-      }
-    }
-  }
-
-  const seenSlugs = new Set(metas.map((m) => m.slug));
-  for (const file of files) {
-    if (file.endsWith(".html")) {
-      const slug = file.replace(/\.html$/, "");
-      if (!seenSlugs.has(slug)) {
-        metas.push(legacyMeta(slug));
-      }
-    }
-  }
-  return metas;
-}
-
-function legacyMeta(slug: string): DigestMeta {
-  const d = slugToDate(slug);
-  return {
-    slug,
-    generatedAt: d.toISOString(),
-    videoCount: 0,
-    channels: [],
-    headlines: [],
-  };
-}
-
-function slugToDate(slug: string): Date {
-  const m = slug.match(/^(\d{4})-(\d{2})-(\d{2})-(\d{2})(\d{2})$/);
-  if (!m) return new Date();
-  return new Date(
-    Number(m[1]),
-    Number(m[2]) - 1,
-    Number(m[3]),
-    Number(m[4]),
-    Number(m[5]),
-  );
-}
 
 function renderLanding(
   metas: DigestMeta[],

@@ -1,33 +1,32 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
-
-const STATE_PATH = "state/last-checked.json";
+import { db } from "./db.js";
 
 export interface StateFile {
   seenVideoIds: string[];
 }
 
 export async function loadState(): Promise<StateFile> {
-  try {
-    const raw = await readFile(STATE_PATH, "utf8");
-    const parsed = JSON.parse(raw) as Partial<StateFile>;
-    return { seenVideoIds: parsed.seenVideoIds ?? [] };
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-      return { seenVideoIds: [] };
-    }
-    throw err;
+  const { data, error } = await db
+    .from("tube_channel_state")
+    .select("seen_video_ids");
+  if (error) throw new Error(`state 조회 실패: ${error.message}`);
+  const seen = new Set<string>();
+  for (const row of data ?? []) {
+    for (const id of (row.seen_video_ids as string[]) ?? []) seen.add(id);
   }
+  return { seenVideoIds: Array.from(seen) };
 }
 
 export async function saveState(state: StateFile): Promise<void> {
-  await mkdir(dirname(STATE_PATH), { recursive: true });
-  await writeFile(STATE_PATH, JSON.stringify(state, null, 2), "utf8");
+  // 전체 seen 목록을 채널 구분 없이 단일 sentinel row로 보관
+  const { error } = await db.from("tube_channel_state").upsert(
+    { channel_id: "__all__", seen_video_ids: state.seenVideoIds, checked_at: new Date().toISOString() },
+    { onConflict: "channel_id" },
+  );
+  if (error) throw new Error(`state 저장 실패: ${error.message}`);
 }
 
 export function markSeen(state: StateFile, videoIds: string[]): StateFile {
   const set = new Set(state.seenVideoIds);
   for (const id of videoIds) set.add(id);
-  const recent = Array.from(set).slice(-500);
-  return { seenVideoIds: recent };
+  return { seenVideoIds: Array.from(set).slice(-500) };
 }

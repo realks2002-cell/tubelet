@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { db } from "./db.js";
 import type { DigestMeta } from "./save.js";
 import { enhancementScript, enhancementStyles } from "./html.js";
 
@@ -71,6 +72,21 @@ export async function regenerateChannelPages(
   return results;
 }
 
+export function renderChannelPageFromDb(
+  name: string,
+  rows: Array<Record<string, unknown>>,
+): string {
+  const videos: ChannelVideo[] = rows.map((r) => ({
+    videoId: r.video_id as string,
+    headline: (r.headline as string) ?? "",
+    videoTitle: r.video_title as string,
+    stockCount: ((r.stocks as unknown[]) ?? []).length,
+    digestSlug: "",
+    digestDate: (r.generated_at as string) ?? new Date().toISOString(),
+  }));
+  return renderChannelPage(name, videos);
+}
+
 function renderChannelPage(name: string, videos: ChannelVideo[]): string {
   const totalStocks = videos.reduce((sum, v) => sum + v.stockCount, 0);
   const latestDate = videos[0]?.digestDate
@@ -84,7 +100,7 @@ function renderChannelPage(name: string, videos: ChannelVideo[]): string {
       const dateLabel = formatDate(d);
       const relative = formatRelative(d);
       const thumb = `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`;
-      const href = `../digest/${v.digestSlug}.html#v-${v.videoId}`;
+      const href = `/video/${v.videoId}`;
       const stocksChip =
         v.stockCount > 0
           ? `<span class="chip accent">종목 ${v.stockCount}</span>`

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx src/server.ts",
+    "dev": "tsx src/index.ts",
     "serve": "tsx src/server.ts",
     "pipeline": "tsx src/index.ts",
     "build": "tsc",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
     "@hono/node-server": "^1.19.14",
+    "@supabase/supabase-js": "^2.103.3",
     "@vercel/blob": "^2.3.3",
     "dotenv": "^16.6.1",
     "hono": "^4.12.14",
