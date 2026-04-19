@@ -243,6 +243,90 @@ img { display: block; max-width: 100%; }
   .act-box .it { grid-template-columns: 24px 1fr; gap: 10px; }
 }
 
+
+/* tubelet-enhance:v1 */
+.top-home {
+  display: flex; align-items: center; gap: 14px;
+  color: inherit; text-decoration: none;
+}
+.top-home:hover .brand { color: var(--ink); }
+.vn-section { margin: 32px 0 56px; }
+.vn-section-hd {
+  display: flex; align-items: baseline; gap: 14px;
+  padding-bottom: 14px; margin-bottom: 0;
+  border-bottom: 1px solid var(--rule);
+}
+.vn-section-hd .num {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.14em; color: var(--ink-3); text-transform: uppercase;
+}
+.vn-section-hd h2 {
+  font-family: var(--font-sans); font-size: 22px;
+  font-weight: 600; letter-spacing: -0.02em; margin: 0;
+}
+.vn-section-hd .cnt {
+  margin-left: auto; font-family: var(--font-mono);
+  font-size: 11px; color: var(--ink-3);
+}
+.video-nav {
+  display: flex; flex-direction: column;
+}
+.vn-item {
+  display: grid; grid-template-columns: 42px 1fr 20px;
+  gap: 14px; align-items: center;
+  padding: 14px 12px 14px 4px;
+  border-bottom: 1px solid var(--rule);
+  color: inherit; text-decoration: none;
+  transition: background .12s, border-color .12s;
+  cursor: pointer;
+}
+.vn-item:hover { background: var(--bg-tint); }
+.vn-item--active {
+  background: var(--ink); color: #fff;
+  border-color: var(--ink);
+}
+.vn-item--active + .vn-item { border-top: 1px solid var(--ink); margin-top: -1px; }
+.vn-num {
+  font-family: var(--font-mono); font-size: 11.5px;
+  color: var(--ink-3); letter-spacing: 0.05em; text-align: center;
+}
+.vn-item--active .vn-num { color: rgba(255,255,255,.65); }
+.vn-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.vn-channel {
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-3);
+  letter-spacing: 0.05em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vn-item--active .vn-channel { color: rgba(255,255,255,.65); }
+.vn-headline {
+  font-family: var(--font-sans); font-size: 15px; font-weight: 500;
+  color: var(--ink); letter-spacing: -0.01em; line-height: 1.4;
+  overflow: hidden; text-overflow: ellipsis;
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+}
+.vn-item--active .vn-headline { color: #fff; }
+.vn-arrow {
+  font-family: var(--font-mono); font-size: 14px;
+  color: var(--ink-3);
+  transition: transform .12s, color .12s;
+  text-align: center;
+}
+.vn-item:hover .vn-arrow { color: var(--ink); transform: translateX(2px); }
+.vn-item--active .vn-arrow { color: rgba(255,255,255,.65); }
+.vn-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-sans); font-size: 12.5px; font-weight: 500;
+  color: var(--ink-2); text-decoration: none; cursor: pointer;
+  background: #fff; border: 1px solid var(--rule-strong); border-radius: 6px;
+  padding: 7px 12px; margin-bottom: 32px;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.vn-back:hover { background: var(--bg-tint); color: var(--ink); border-color: var(--ink); }
+@media (max-width: 720px) {
+  .vn-item { grid-template-columns: 32px 1fr 18px; padding: 12px 8px 12px 2px; gap: 10px; }
+  .vn-headline { font-size: 14px; }
+}
+
 </style>
 </head>
 <body>
@@ -357,5 +441,118 @@ img { display: block; max-width: 100%; }
   </footer>
 
 </div>
+<script>
+
+(function () {
+  if (window.__tubeletEnhanced) return;
+  window.__tubeletEnhanced = true;
+
+  // 1. Wrap logo with home link (if not already a link)
+  const topEl = document.querySelector('.top');
+  const markEl = topEl && topEl.querySelector('.mark');
+  const brandEl = topEl && topEl.querySelector('.brand');
+  if (topEl && markEl && brandEl && !markEl.closest('a')) {
+    const a = document.createElement('a');
+    a.href = '/';
+    a.className = 'top-home';
+    a.setAttribute('aria-label', '홈으로');
+    topEl.insertBefore(a, markEl);
+    a.appendChild(markEl);
+    a.appendChild(brandEl);
+  }
+
+  // 2. If 2+ articles, switch to list + detail view
+  const articles = Array.from(document.querySelectorAll('article.article'));
+  if (articles.length < 2) return;
+
+  const masthead = document.querySelector('.masthead');
+  if (!masthead) return;
+
+  const navSection = document.createElement('section');
+  navSection.className = 'sec vn-section';
+  navSection.innerHTML =
+    '<div class="vn-section-hd">' +
+      '<div class="num">List</div>' +
+      '<h2>목록</h2>' +
+      '<span class="cnt">' + articles.length + '편</span>' +
+    '</div>';
+
+  const nav = document.createElement('nav');
+  nav.className = 'video-nav';
+  nav.setAttribute('aria-label', '영상 목록');
+
+  function esc(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  articles.forEach(function (article, i) {
+    const id = article.id;
+    const numEl = article.querySelector('.art-num');
+    const chEl = article.querySelector('.art-channel');
+    const hdEl = article.querySelector('.art-headline');
+    const num = (numEl && numEl.textContent) || String(i + 1).padStart(2, '0');
+    const channel = (chEl && chEl.textContent) || '';
+    const headline = (hdEl && hdEl.textContent) || '';
+    const item = document.createElement('a');
+    item.className = 'vn-item';
+    item.href = '#' + id;
+    item.dataset.target = id;
+    item.innerHTML =
+      '<span class="vn-num">' + esc(num) + '</span>' +
+      '<span class="vn-main">' +
+        '<span class="vn-channel">' + esc(channel) + '</span>' +
+        '<span class="vn-headline">' + esc(headline) + '</span>' +
+      '</span>' +
+      '<span class="vn-arrow" aria-hidden="true">›</span>';
+    nav.appendChild(item);
+  });
+
+  navSection.appendChild(nav);
+  masthead.after(navSection);
+
+  articles.forEach(function (a) { a.hidden = true; });
+
+  articles.forEach(function (article) {
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'vn-back';
+    back.innerHTML = '<span aria-hidden="true">←</span> 목록으로';
+    back.addEventListener('click', function () {
+      history.pushState(null, '', location.pathname);
+      showState();
+      navSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    article.insertBefore(back, article.firstChild);
+  });
+
+  function showState() {
+    const hashId = (location.hash || '').replace('#', '');
+    const target = hashId ? articles.find(function (a) { return a.id === hashId; }) : null;
+    articles.forEach(function (a) { a.hidden = a !== target; });
+    nav.querySelectorAll('.vn-item').forEach(function (item) {
+      const t = item.dataset.target;
+      item.classList.toggle('vn-item--active', !!target && t === target.id);
+    });
+  }
+
+  showState();
+
+  nav.addEventListener('click', function (e) {
+    const item = e.target && e.target.closest ? e.target.closest('.vn-item') : null;
+    if (!item) return;
+    e.preventDefault();
+    const id = item.dataset.target;
+    if (!id) return;
+    history.pushState(null, '', '#' + id);
+    showState();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  window.addEventListener('hashchange', showState);
+})();
+
+</script>
 </body>
 </html>
