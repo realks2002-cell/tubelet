@@ -115,7 +115,7 @@ function renderArticle(item: DigestItem, index: number): string {
 
   <h2 class="art-headline">${escapeHtml(summary.headline)}</h2>
 
-  <p class="art-deck">${escapeHtml(summary.summary)}</p>
+  <div class="art-deck">${renderParagraphs(summary.summary)}</div>
 
   <a class="art-thumb" href="${escapeAttr(video.url)}" target="_blank" rel="noopener">
     <img src="${thumb}" alt="" />
@@ -232,6 +232,15 @@ function formatTime(d: Date): string {
 
 function formatDateTime(d: Date): string {
   return `${formatDate(d)} ${formatTime(d)}`;
+}
+
+function renderParagraphs(text: string): string {
+  return text
+    .split(/\n\n+/)
+    .map((para) => para.trim())
+    .filter(Boolean)
+    .map((para) => `<p>${escapeHtml(para)}</p>`)
+    .join("\n");
 }
 
 function escapeHtml(s: string): string {
@@ -364,10 +373,14 @@ img { display: block; max-width: 100%; }
 }
 
 .art-deck {
-  font-family: var(--font-sans); font-size: 19px; font-weight: 500;
-  line-height: 1.5; color: var(--ink-2);
-  margin: 0 0 32px; text-wrap: pretty;
+  font-family: var(--font-sans); font-size: 18px; font-weight: 400;
+  line-height: 1.75; color: var(--ink-2);
+  margin: 0 0 32px;
 }
+.art-deck p {
+  margin: 0 0 16px; text-wrap: pretty;
+}
+.art-deck p:last-child { margin-bottom: 0; }
 
 .art-thumb {
   display: block; margin: 0 0 32px;

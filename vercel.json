@@ -3,6 +3,7 @@
   "framework": null,
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/compose", "destination": "/api/page-compose" },
     { "source": "/digest/:slug", "destination": "/api/page-digest?slug=:slug" },
     { "source": "/channel/:slug", "destination": "/api/page-channel?slug=:slug" },
     { "source": "/video/:id", "destination": "/api/page-video?id=:id" },

@@ -110,6 +110,10 @@ ${landingStyles()}
     </a>
     <span class="v">Archive · 개인 다이제스트</span>
     <nav class="top-nav">
+      <a href="/compose" class="nav-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Compose
+      </a>
       <button type="button" class="nav-btn" id="channels-menu-btn" aria-haspopup="dialog" aria-expanded="false">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
         채널 관리
@@ -127,30 +131,6 @@ ${landingStyles()}
       <div class="stat"><span class="k">Channels</span><span class="v">${allChannelNames.size}곳</span></div>
     </div>
   </header>
-
-  <section class="compose">
-    <div class="sec-hd">
-      <div class="num">Compose</div>
-      <h2>링크 하나로 바로 요약</h2>
-      <div class="desc">YouTube URL을 붙여넣으면 이 자리에 바로 정리해 드려요.</div>
-    </div>
-    <form id="compose-form" class="compose-form">
-      <div class="compose-input-wrap">
-        <svg class="compose-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6.5 9.5l3-3"/><path d="M5 8a3 3 0 0 1 3-3h2.5a3 3 0 0 1 0 6H9"/><path d="M11 8a3 3 0 0 1-3 3H5.5a3 3 0 0 1 0-6H7"/></svg>
-        <input
-          id="compose-url"
-          name="url"
-          type="url"
-          placeholder="https://www.youtube.com/watch?v=... 또는 https://youtu.be/..."
-          required
-          autocomplete="off"
-          spellcheck="false"
-        />
-        <button type="submit" class="btn pri">정리하기</button>
-      </div>
-      <div id="compose-status" class="compose-status" role="status" aria-live="polite"></div>
-    </form>
-  </section>
 
   ${channelCards}
 
@@ -180,7 +160,6 @@ ${landingStyles()}
 ${renderChannelsModal(activeChannels, channelSummaries)}
 
 <script>
-${composeScript()}
 ${channelsScript()}
 </script>
 </body>
@@ -216,7 +195,7 @@ function renderChannelCard(s: ChannelSummary, isActive: boolean): string {
   const d = new Date(s.latestDate);
   const dateLabel = formatDate(d);
   const relative = formatRelative(d);
-  const href = `channel/${channelSlug(s.name)}.html`;
+  const href = `/channel/${channelSlug(s.name)}`;
   const theme = channelTheme(s.name);
   return `<a class="channel-card cc-t${theme}" href="${href}">
     <div class="cc-head">
@@ -422,55 +401,6 @@ function channelsScript(): string {
 `;
 }
 
-function composeScript(): string {
-  return `
-(function () {
-  const form = document.getElementById('compose-form');
-  const input = document.getElementById('compose-url');
-  const status = document.getElementById('compose-status');
-  const button = form ? form.querySelector('button[type="submit"]') : null;
-  if (!form || !input || !status || !button) return;
-
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const url = input.value.trim();
-    if (!url) return;
-
-    button.disabled = true;
-    input.disabled = true;
-    status.className = 'compose-status loading';
-    status.innerHTML = '<span class="spinner"></span> 자막 추출 · Claude 요약 중… 30초~1분 걸릴 수 있어요.';
-
-    try {
-      const res = await fetch('/api/summarize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || '요약 실패');
-
-      status.className = 'compose-status success';
-      status.innerHTML =
-        '<span class="ok">✓</span> <b>' + escape(data.headline) + '</b> 정리 완료. ' +
-        '배포까지 약 1~2분. <a href="' + data.digestUrl + '" target="_blank" rel="noopener">열어보기 →</a>';
-    } catch (err) {
-      status.className = 'compose-status error';
-      status.textContent = '✗ ' + (err.message || String(err));
-      button.disabled = false;
-      input.disabled = false;
-    }
-  });
-
-  function escape(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-})();
-`;
-}
 
 function renderEmpty(): string {
   return `<div class="empty">
@@ -508,7 +438,7 @@ function renderDigestCard(meta: DigestMeta): string {
   const moreLabel =
     meta.headlines.length > 4 ? `<li class="pv-more mono">+ ${meta.headlines.length - 4}편 더</li>` : "";
 
-  return `<a class="digest-card" href="digest/${meta.slug}.html">
+  return `<a class="digest-card" href="/digest/${meta.slug}">
     <div class="dc-head">
       <div class="dc-date-block">
         <span class="dc-date">${dateLabel}</span>
@@ -657,63 +587,6 @@ a { color: inherit; text-decoration: none; }
 }
 .stat .v { font-family: var(--font-sans); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
 
-/* Compose (URL input) */
-.compose {
-  margin: 0 0 72px;
-  padding: 32px 36px 36px;
-  background: #fff;
-  border: 1px solid var(--rule);
-  border-radius: 14px;
-  position: relative;
-}
-.compose .sec-hd {
-  padding-bottom: 0; border-bottom: none; margin-bottom: 18px;
-}
-.compose-form {
-  display: flex; flex-direction: column; gap: 10px;
-}
-.compose-input-wrap {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 10px; align-items: center;
-  padding: 8px 10px 8px 14px;
-  background: #fff;
-  border: 1px solid var(--rule-strong);
-  border-radius: 8px;
-  transition: border-color .12s, box-shadow .12s;
-}
-.compose-input-wrap:focus-within {
-  border-color: var(--ink);
-  box-shadow: 0 0 0 3px oklch(0.88 0.04 75);
-}
-.compose-icon { color: var(--ink-3); flex-shrink: 0; }
-#compose-url {
-  font-family: var(--font-sans); font-size: 15px;
-  color: var(--ink); background: none; border: none; outline: none;
-  min-width: 0; width: 100%;
-  padding: 6px 0;
-}
-#compose-url::placeholder { color: var(--ink-4); }
-#compose-url:disabled { color: var(--ink-3); }
-
-.compose-status {
-  font-size: 13px; color: var(--ink-3); min-height: 20px;
-  line-height: 1.5;
-}
-.compose-status.loading { color: var(--ink-2); }
-.compose-status.success { color: oklch(0.4 0.12 145); }
-.compose-status.error { color: oklch(0.45 0.15 28); }
-.compose-status .ok { color: oklch(0.55 0.14 145); font-weight: 600; margin-right: 4px; }
-.compose-status a { color: var(--ink); border-bottom: 1px solid var(--rule-strong); }
-.compose-status .spinner {
-  display: inline-block; width: 12px; height: 12px;
-  border: 2px solid var(--rule);
-  border-top-color: var(--ink);
-  border-radius: 50%;
-  animation: compose-spin .8s linear infinite;
-  vertical-align: -2px; margin-right: 6px;
-}
-@keyframes compose-spin { to { transform: rotate(360deg); } }
 
 .btn.pri {
   background: var(--ink); color: #fff;
@@ -1022,9 +895,6 @@ a { color: inherit; text-decoration: none; }
   .stat-row { gap: 24px; }
   .digest-list { grid-template-columns: 1fr; }
   .channel-grid { grid-template-columns: 1fr; }
-  .compose { padding: 24px 20px; }
-  .compose-input-wrap { grid-template-columns: auto 1fr; gap: 8px; }
-  .compose-input-wrap .btn.pri { grid-column: 1 / -1; padding: 11px 16px; }
   .modal { padding: 20px 12px; }
   .modal-body { padding: 20px 20px 24px; }
   .modal-head { padding: 20px 20px 14px; }

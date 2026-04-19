@@ -8,6 +8,7 @@ import { regenerateLanding } from "./landing.js";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { buildAuthUrl, exchangeCodeForToken, isKakaoConfigured } from "./kakao.js";
+import { renderComposePage } from "./compose-page.js";
 import { extractVideoId, fetchVideoById } from "./youtube.js";
 import { fetchTranscript } from "./transcript.js";
 import { summarizeVideo } from "./summarize.js";
@@ -44,6 +45,11 @@ app.get("/auth/kakao/callback", async (c) => {
   } catch (err) {
     return c.text(`토큰 교환 실패: ${(err as Error).message}`, 500);
   }
+});
+
+// Compose 페이지
+app.get("/compose", (c) => {
+  return c.html(renderComposePage());
 });
 
 // 랜딩
