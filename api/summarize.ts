@@ -1,3 +1,4 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { put } from "@vercel/blob";
 import { extractVideoId, fetchVideoById } from "../src/youtube.js";
 import { fetchTranscript } from "../src/transcript.js";
@@ -7,26 +8,31 @@ import { isKakaoConfigured, sendDigestToKakao } from "../src/kakao.js";
 
 export const maxDuration = 60;
 
-export default async function handler(req: Request): Promise<Response> {
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse,
+) {
   if (req.method !== "POST") {
-    return json({ error: "POST 메서드만 허용됩니다." }, 405);
+    res.status(405).json({ error: "POST 메서드만 허용됩니다." });
+    return;
   }
 
-  let body: { url?: string };
-  try {
-    body = (await req.json()) as { url?: string };
-  } catch {
-    return json({ error: "JSON body가 필요합니다." }, 400);
-  }
+  const url =
+    typeof req.body === "object" && req.body !== null
+      ? (req.body as { url?: string }).url?.trim()
+      : undefined;
 
-  const url = body.url?.trim();
   if (!url) {
-    return json({ error: "url 필드가 필요합니다." }, 400);
+    res.status(400).json({ error: "url 필드가 필요합니다." });
+    return;
   }
 
   const videoId = extractVideoId(url);
   if (!videoId) {
-    return json({ error: "유효한 YouTube URL 또는 videoId가 아닙니다." }, 400);
+    res
+      .status(400)
+      .json({ error: "유효한 YouTube URL 또는 videoId가 아닙니다." });
+    return;
   }
 
   try {
@@ -60,7 +66,7 @@ export default async function handler(req: Request): Promise<Response> {
       }
     }
 
-    return json({
+    res.status(200).json({
       ok: true,
       slug,
       digestUrl: blob.url,
@@ -74,15 +80,8 @@ export default async function handler(req: Request): Promise<Response> {
   } catch (err) {
     const msg = (err as Error).message;
     console.error(`summarize 실패: ${msg}`);
-    return json({ error: msg }, 500);
+    res.status(500).json({ error: msg });
   }
-}
-
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json; charset=utf-8" },
-  });
 }
 
 function toSlug(d: Date): string {
