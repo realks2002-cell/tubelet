@@ -1,6 +1,7 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { DigestMeta } from "./save.js";
+import { channelSlug, regenerateChannelPages } from "./channel-pages.js";
 
 const DIGEST_DIR = resolve("public/digest");
 const INDEX_PATH = resolve("public/index.html");
@@ -26,6 +27,7 @@ export async function regenerateLanding(): Promise<string> {
   metas.sort((a, b) => (a.slug < b.slug ? 1 : -1));
 
   const activeChannels = await loadActiveChannels();
+  await regenerateChannelPages(metas);
   const html = renderLanding(metas, activeChannels);
   await writeFile(INDEX_PATH, html, "utf8");
   return INDEX_PATH;
@@ -269,7 +271,7 @@ function renderChannelCard(s: ChannelSummary, isActive: boolean): string {
   const d = new Date(s.latestDate);
   const dateLabel = formatDate(d);
   const relative = formatRelative(d);
-  const href = `digest/${s.latestSlug}.html#v-${s.latestVideoId}`;
+  const href = `channel/${channelSlug(s.name)}.html`;
   return `<a class="channel-card" href="${href}">
     <div class="cc-head">
       <div class="cc-avatar" aria-hidden="true">${escapeHtml(initials(s.name))}</div>
@@ -286,7 +288,7 @@ function renderChannelCard(s: ChannelSummary, isActive: boolean): string {
       <span class="sp"></span>
       <span class="mono">${s.videoCount}편</span>
     </div>
-    <div class="cc-cta mono">하이라이트로 이동 →</div>
+    <div class="cc-cta mono">채널 보기 →</div>
   </a>`;
 }
 
