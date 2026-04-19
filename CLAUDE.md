@@ -13,7 +13,7 @@
 ### 배포 흐름
 
 ```
-로컬 npm run dev
+로컬 npm run pipeline
         │
         ├─ public/digest/*.html, state/last-checked.json 생성
         │
@@ -24,7 +24,7 @@
 
 GitHub Actions cron (매시간)
         │
-        └─ npm run dev → 자동 커밋 → Vercel 재배포 + 카톡 발송
+        └─ npm run pipeline → 자동 커밋 → Vercel 재배포 + 카톡 발송
 ```
 
 ### Vercel 환경 설정
@@ -46,7 +46,10 @@ Actions 실행을 위해 레포 Secrets에 등록:
 
 ## 프로젝트 개요
 - 언어: TypeScript + Node.js (ESM)
-- 실행: `npm run dev` (로컬 cron), `npm run serve` (URL 즉석 요약 웹서버), GitHub Actions cron (프로덕션)
+- 실행:
+  - `npm run dev` = `npm run serve`: 로컬 웹서버 (Compose UI + 정적 페이지, 기본 포트 3000)
+  - `npm run pipeline`: 배치 파이프라인 (구독 채널 순회 → 요약 → HTML/카톡)
+  - GitHub Actions cron (프로덕션): 매시간 `npm run pipeline` 실행
 - 파이프라인: YouTube Data API → 자막 추출 → Claude 요약 (Haiku 4.5) → HTML 다이제스트 → 카톡 발송
 
 ## 디자인 시스템 · Tubelet

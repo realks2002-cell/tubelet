@@ -32,7 +32,7 @@ jobs:
           KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
           KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
           SITE_URL: ${{ secrets.SITE_URL }}
-        run: npm run dev
+        run: npm run pipeline
 
       - name: Commit digests
         run: |
