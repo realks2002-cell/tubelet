@@ -175,7 +175,7 @@ ${landingStyles()}
   <header class="masthead">
     <div class="eyebrow">Tubelet / Personal Archive</div>
     <h1>매거진을 읽듯,<br /><em>하루를 시작해요.</em></h1>
-    <p class="lead">구독한 YouTube 채널의 새 영상을 자동으로 요약해 모아둔 다이제스트 아카이브입니다.</p>
+    <p class="lead">구독 채널의 새 영상을 매시간 요약해 모아둔 아카이브.</p>
     <div class="stat-row">
       <div class="stat"><span class="k">Digests</span><span class="v">${totalDigests}개</span></div>
       <div class="stat"><span class="k">Videos</span><span class="v">${totalVideos}편</span></div>
@@ -272,7 +272,8 @@ function renderChannelCard(s: ChannelSummary, isActive: boolean): string {
   const dateLabel = formatDate(d);
   const relative = formatRelative(d);
   const href = `channel/${channelSlug(s.name)}.html`;
-  return `<a class="channel-card" href="${href}">
+  const theme = channelTheme(s.name);
+  return `<a class="channel-card cc-t${theme}" href="${href}">
     <div class="cc-head">
       <div class="cc-avatar" aria-hidden="true">${escapeHtml(initials(s.name))}</div>
       <div class="cc-title">
@@ -293,7 +294,8 @@ function renderChannelCard(s: ChannelSummary, isActive: boolean): string {
 }
 
 function renderPendingChannelCard(c: ActiveChannel): string {
-  return `<div class="channel-card channel-card--pending">
+  const theme = channelTheme(c.name);
+  return `<div class="channel-card channel-card--pending cc-t${theme}">
     <div class="cc-head">
       <div class="cc-avatar cc-avatar--dim" aria-hidden="true">${escapeHtml(initials(c.name))}</div>
       <div class="cc-title">
@@ -314,6 +316,14 @@ function initials(name: string): string {
   if (!trimmed) return "?";
   const match = trimmed.match(/[\p{L}\p{N}]/u);
   return (match?.[0] ?? "?").toUpperCase();
+}
+
+function channelTheme(name: string): number {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) {
+    h = ((h << 5) - h + name.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h) % 6;
 }
 
 function renderChannelsModal(
@@ -880,22 +890,37 @@ a { color: inherit; text-decoration: none; }
 .channel-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
 }
+.cc-t0 { --ch-stripe: oklch(0.72 0.14 75);  --ch-bg: oklch(0.95 0.04 80);  --ch-ink: oklch(0.32 0.10 60); }
+.cc-t1 { --ch-stripe: oklch(0.68 0.11 180); --ch-bg: oklch(0.95 0.03 190); --ch-ink: oklch(0.35 0.08 195); }
+.cc-t2 { --ch-stripe: oklch(0.67 0.13 25);  --ch-bg: oklch(0.95 0.03 30);  --ch-ink: oklch(0.36 0.10 25); }
+.cc-t3 { --ch-stripe: oklch(0.67 0.10 140); --ch-bg: oklch(0.95 0.03 140); --ch-ink: oklch(0.34 0.08 140); }
+.cc-t4 { --ch-stripe: oklch(0.66 0.11 280); --ch-bg: oklch(0.95 0.03 280); --ch-ink: oklch(0.36 0.08 280); }
+.cc-t5 { --ch-stripe: oklch(0.66 0.10 240); --ch-bg: oklch(0.95 0.03 240); --ch-ink: oklch(0.34 0.08 240); }
 .channel-card {
   display: flex; flex-direction: column; gap: 12px;
-  padding: 20px 22px; border: 1px solid var(--rule);
+  padding: 20px 22px 20px 26px; border: 1px solid var(--rule);
   border-radius: 10px; background: #fff;
   transition: border-color .12s, transform .12s;
   color: inherit; min-height: 170px;
+  position: relative; overflow: hidden;
+}
+.channel-card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--ch-stripe, var(--accent));
+  transition: width .12s;
 }
 .channel-card:hover {
   border-color: var(--ink); transform: translateY(-2px);
 }
-.channel-card--pending { cursor: default; }
+.channel-card:hover::before { width: 6px; }
+.channel-card--pending { cursor: default; opacity: 0.75; }
 .channel-card--pending:hover { border-color: var(--rule); transform: none; }
+.channel-card--pending:hover::before { width: 4px; }
 .cc-head { display: flex; align-items: center; gap: 10px; }
 .cc-avatar {
   width: 34px; height: 34px; border-radius: 999px;
-  background: var(--accent-bg); color: var(--accent-ink);
+  background: var(--ch-bg, var(--accent-bg));
+  color: var(--ch-ink, var(--accent-ink));
   display: inline-grid; place-items: center;
   font-family: var(--font-sans); font-size: 14px; font-weight: 600;
   flex-shrink: 0;
