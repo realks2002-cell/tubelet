@@ -5,10 +5,7 @@ import { summarizeVideo } from "../src/summarize.js";
 import { renderDigest, type DigestItem } from "../src/html.js";
 import { isKakaoConfigured, sendDigestToKakao } from "../src/kakao.js";
 
-export const config = {
-  runtime: "nodejs",
-  maxDuration: 120,
-};
+export const maxDuration = 60;
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== "POST") {
