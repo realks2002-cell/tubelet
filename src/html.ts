@@ -97,7 +97,7 @@ function renderArticle(item: DigestItem, index: number): string {
       ? renderStocks(summary.stocks)
       : "";
 
-  return `<article class="article">
+  return `<article class="article" id="v-${video.videoId}">
 
   <div class="art-meta">
     <span class="art-num">${num}</span>
