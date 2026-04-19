@@ -186,8 +186,13 @@ function requireRestApiKey(): string {
 }
 
 async function saveToken(token: CachedToken): Promise<void> {
-  await mkdir(dirname(TOKEN_CACHE_PATH), { recursive: true });
-  await writeFile(TOKEN_CACHE_PATH, JSON.stringify(token, null, 2), "utf8");
+  try {
+    await mkdir(dirname(TOKEN_CACHE_PATH), { recursive: true });
+    await writeFile(TOKEN_CACHE_PATH, JSON.stringify(token, null, 2), "utf8");
+  } catch {
+    // Vercel 등 읽기전용 FS 환경에서는 캐시 저장 실패를 무시.
+    // refresh_token은 환경변수에 있으므로 다음 호출 시 다시 갱신 가능.
+  }
 }
 
 async function loadToken(): Promise<CachedToken | null> {

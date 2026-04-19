@@ -7,6 +7,7 @@ import { renderDigest, type DigestItem } from "./html.js";
 import { regenerateLanding } from "./landing.js";
 import type { DigestMeta } from "./save.js";
 import { isKakaoConfigured, sendDigestToKakao } from "./kakao.js";
+import { isEmailConfigured, sendDigestEmail } from "./email.js";
 
 export interface SoloResult {
   slug: string;
@@ -59,14 +60,24 @@ export async function summarizeSingleUrl(url: string): Promise<SoloResult> {
 
   await regenerateLanding();
 
+  const siteBase = process.env.SITE_URL ?? `http://localhost:3000`;
+  const digestUrl = `${siteBase}/digest/${slug}.html`;
+
   if (isKakaoConfigured()) {
     try {
-      const siteBase = process.env.SITE_URL ?? `http://localhost:3000`;
-      const digestUrl = `${siteBase}/digest/${slug}.html`;
       await sendDigestToKakao(digest, digestUrl);
       console.log(`  ✓ 카톡 전송 완료`);
     } catch (err) {
       console.error(`  ✗ 카카오 전송 실패:`, (err as Error).message);
+    }
+  }
+
+  if (isEmailConfigured()) {
+    try {
+      await sendDigestEmail(html, digest, digestUrl);
+      console.log(`  ✓ 이메일 전송 완료`);
+    } catch (err) {
+      console.error(`  ✗ 이메일 전송 실패:`, (err as Error).message);
     }
   }
 
