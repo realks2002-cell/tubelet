@@ -3,5 +3,10 @@
   "outputDirectory": "public",
   "framework": null,
   "buildCommand": "true",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "functions": {
+    "api/**/*.ts": {
+      "maxDuration": 60
+    }
+  }
 }
