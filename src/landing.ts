@@ -497,9 +497,8 @@ function composeScript(): string {
 
       status.className = 'compose-status success';
       status.innerHTML =
-        '<span class="ok">✓</span> <b>' + escape(data.headline) + '</b> — ' +
-        '<a href="' + data.digestUrl + '">열어보기 →</a>';
-      setTimeout(function () { window.location.href = data.digestUrl; }, 1200);
+        '<span class="ok">✓</span> <b>' + escape(data.headline) + '</b> 정리 완료. ' +
+        '배포까지 약 1~2분. <a href="' + data.digestUrl + '" target="_blank" rel="noopener">열어보기 →</a>';
     } catch (err) {
       status.className = 'compose-status error';
       status.textContent = '✗ ' + (err.message || String(err));

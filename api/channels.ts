@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { commitFiles } from "../src/github.js";
 
 export const maxDuration = 30;
 
@@ -199,32 +200,21 @@ async function commitChannelsFile(
   repo: string,
   branch: string,
   token: string,
-  sha: string,
+  _sha: string,
   content: ChannelsFile,
   message: string,
 ): Promise<void> {
-  const encoded = Buffer.from(JSON.stringify(content, null, 2) + "\n").toString(
-    "base64",
-  );
-  const res = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/contents/channels.json`,
-    {
-      method: "PUT",
-      headers: {
-        Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${token}`,
-        "X-GitHub-Api-Version": "2022-11-28",
-        "Content-Type": "application/json",
+  await commitFiles({
+    token,
+    owner,
+    repo,
+    branch,
+    files: [
+      {
+        path: "channels.json",
+        content: JSON.stringify(content, null, 2) + "\n",
       },
-      body: JSON.stringify({
-        message,
-        content: encoded,
-        sha,
-        branch,
-      }),
-    },
-  );
-  if (!res.ok) {
-    throw new Error(`GitHub commit 실패 ${res.status}: ${await res.text()}`);
-  }
+    ],
+    message,
+  });
 }

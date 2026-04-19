@@ -1,10 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { put } from "@vercel/blob";
 import { extractVideoId, fetchVideoById } from "../src/youtube.js";
 import { fetchTranscript } from "../src/transcript.js";
 import { summarizeVideo } from "../src/summarize.js";
 import { renderDigest, type DigestItem } from "../src/html.js";
 import { isKakaoConfigured, sendDigestToKakao } from "../src/kakao.js";
+import { commitFiles, requireGitHubEnv } from "../src/github.js";
+import type { DigestMeta } from "../src/save.js";
 
 export const maxDuration = 60;
 
@@ -21,7 +22,6 @@ export default async function handler(
     typeof req.body === "object" && req.body !== null
       ? (req.body as { url?: string }).url?.trim()
       : undefined;
-
   if (!url) {
     res.status(400).json({ error: "url 필드가 필요합니다." });
     return;
@@ -37,6 +37,8 @@ export default async function handler(
 
   try {
     console.log(`[api/summarize] ${videoId}`);
+    const gh = requireGitHubEnv();
+
     const video = await fetchVideoById(videoId);
     const transcript = await fetchTranscript(videoId);
     const summary = await summarizeVideo(video, transcript);
@@ -46,19 +48,45 @@ export default async function handler(
     ];
     const html = renderDigest(digest);
 
-    const slug = `solo-${toSlug(new Date())}-${videoId}`;
-    const blob = await put(`digest/${slug}.html`, html, {
-      access: "public",
-      contentType: "text/html; charset=utf-8",
-      addRandomSuffix: false,
-      allowOverwrite: true,
+    const now = new Date();
+    const slug = `solo-${toSlug(now)}-${videoId}`;
+
+    const meta: DigestMeta = {
+      slug,
+      generatedAt: now.toISOString(),
+      videoCount: 1,
+      channels: [video.channelName],
+      headlines: [
+        {
+          channelName: video.channelName,
+          headline: summary.headline,
+          videoTitle: video.title,
+          videoId,
+          stockCount: summary.stocks.length,
+        },
+      ],
+    };
+
+    await commitFiles({
+      ...gh,
+      files: [
+        { path: `public/digest/${slug}.html`, content: html },
+        {
+          path: `public/digest/${slug}.json`,
+          content: JSON.stringify(meta, null, 2) + "\n",
+        },
+      ],
+      message: `feat: Compose 요약 ${summary.headline}`,
     });
+
+    const siteBase = process.env.SITE_URL ?? "https://tubelet.vercel.app";
+    const digestUrl = `${siteBase}/digest/${slug}.html`;
 
     let kakaoSent = false;
     let kakaoError: string | null = null;
     if (isKakaoConfigured()) {
       try {
-        await sendDigestToKakao(digest, blob.url);
+        await sendDigestToKakao(digest, digestUrl);
         kakaoSent = true;
       } catch (err) {
         kakaoError = (err as Error).message;
@@ -69,13 +97,14 @@ export default async function handler(
     res.status(200).json({
       ok: true,
       slug,
-      digestUrl: blob.url,
+      digestUrl,
       headline: summary.headline,
       channelName: video.channelName,
       videoTitle: video.title,
       stockCount: summary.stocks.length,
       kakaoSent,
       kakaoError,
+      note: "GitHub 커밋 완료. Vercel 재배포 후 1~2분 뒤 URL에 접근 가능합니다.",
     });
   } catch (err) {
     const msg = (err as Error).message;

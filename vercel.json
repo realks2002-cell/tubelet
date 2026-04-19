@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "public",
   "framework": null,
-  "buildCommand": "true",
+  "buildCommand": "npx tsx scripts/build-pages.ts",
   "cleanUrls": true,
   "functions": {
     "api/**/*.ts": {
