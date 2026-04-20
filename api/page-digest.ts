@@ -63,6 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const html = renderDigest(items, new Date(run.generated_at as string));
     res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Cache-Control", "no-store");
     res.status(200).send(html);
   } catch (err) {
     const msg = (err as Error).message;
