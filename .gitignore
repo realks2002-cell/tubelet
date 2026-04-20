@@ -6,3 +6,4 @@ state/kakao-token.json
 *.log
 .DS_Store
 .vercel
+public/index.html

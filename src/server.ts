@@ -55,8 +55,7 @@ app.get("/compose", (c) => {
 // 랜딩
 app.get("/", async (c) => {
   try {
-    await regenerateLanding();
-    const html = await readFile(resolve("public/index.html"), "utf8");
+    const html = await regenerateLanding();
     return c.html(html);
   } catch (err) {
     return c.text((err as Error).message, 500);

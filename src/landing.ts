@@ -1,10 +1,6 @@
-import { writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { db } from "./db.js";
 import { loadAllMetas, type DigestMeta } from "./save.js";
-import { channelSlug, regenerateChannelPages } from "./channel-pages.js";
-
-const INDEX_PATH = resolve("public/index.html");
+import { channelSlug } from "./channel-pages.js";
 
 interface ActiveChannel {
   id: string;
@@ -24,12 +20,8 @@ interface ChannelSummary {
 export async function regenerateLanding(): Promise<string> {
   const metas = await loadAllMetas();
   metas.sort((a, b) => (a.slug < b.slug ? 1 : -1));
-
   const activeChannels = await loadActiveChannels();
-  await regenerateChannelPages(metas);
-  const html = renderLanding(metas, activeChannels);
-  await writeFile(INDEX_PATH, html, "utf8");
-  return INDEX_PATH;
+  return renderLanding(metas, activeChannels);
 }
 
 async function loadActiveChannels(): Promise<ActiveChannel[]> {
