@@ -19,7 +19,7 @@ interface ChannelSummary {
 
 export async function regenerateLanding(): Promise<string> {
   const metas = await loadAllMetas();
-  metas.sort((a, b) => (a.slug < b.slug ? 1 : -1));
+  metas.sort((a, b) => Date.parse(b.generatedAt) - Date.parse(a.generatedAt));
   const activeChannels = await loadActiveChannels();
   return renderLanding(metas, activeChannels);
 }
