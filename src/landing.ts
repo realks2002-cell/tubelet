@@ -1,6 +1,7 @@
 import { db } from "./db.js";
 import { loadAllMetas, type DigestMeta } from "./save.js";
 import { channelSlug } from "./channel-pages.js";
+import { formatDate, formatTime, formatDateTime, formatRelative } from "./dates.js";
 
 interface ActiveChannel {
   id: string;
@@ -446,36 +447,6 @@ function renderDigestCard(meta: DigestMeta): string {
     ${previewLines ? `<ul class="dc-preview">${previewLines}${moreLabel}</ul>` : ""}
     <div class="dc-cta mono">열어보기 →</div>
   </a>`;
-}
-
-function formatDate(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${y}.${m}.${dd} (${dayNames[d.getDay()]})`;
-}
-
-function formatTime(d: Date): string {
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  return `${hh}:${mi}`;
-}
-
-function formatDateTime(d: Date): string {
-  return `${formatDate(d)} ${formatTime(d)}`;
-}
-
-function formatRelative(d: Date): string {
-  const diff = Date.now() - d.getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "방금";
-  if (mins < 60) return `${mins}분 전`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}시간 전`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}일 전`;
-  return `${Math.floor(days / 7)}주 전`;
 }
 
 function escapeHtml(s: string): string {

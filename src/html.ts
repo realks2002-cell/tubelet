@@ -1,5 +1,6 @@
 import type { YoutubeVideo } from "./youtube.js";
 import type { StockItem, VideoSummary } from "./summarize.js";
+import { formatDate, formatTime, formatDateTime } from "./dates.js";
 
 const SENTIMENT_LABEL: Record<StockItem["sentiment"], string> = {
   bull: "강세",
@@ -214,24 +215,6 @@ function uniqueChannelNames(items: DigestItem[]): string {
   if (names.length === 1) return names[0]!;
   if (names.length === 2) return `${names[0]}, ${names[1]}`;
   return `${names[0]} 외 ${names.length - 1}곳`;
-}
-
-function formatDate(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${y}.${m}.${dd} (${dayNames[d.getDay()]})`;
-}
-
-function formatTime(d: Date): string {
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  return `${hh}:${mi}`;
-}
-
-function formatDateTime(d: Date): string {
-  return `${formatDate(d)} ${formatTime(d)}`;
 }
 
 function renderParagraphs(text: string): string {

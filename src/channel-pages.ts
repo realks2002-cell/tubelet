@@ -1,4 +1,5 @@
 import { enhancementScript, enhancementStyles } from "./html.js";
+import { formatDate, formatRelative } from "./dates.js";
 
 export interface ChannelVideo {
   videoId: string;
@@ -343,26 +344,6 @@ a { color: inherit; text-decoration: none; }
   .stat-row { gap: 22px; }
 }
 `;
-}
-
-function formatDate(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${y}.${m}.${dd} (${dayNames[d.getDay()]})`;
-}
-
-function formatRelative(d: Date): string {
-  const diff = Date.now() - d.getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "방금";
-  if (mins < 60) return `${mins}분 전`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}시간 전`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}일 전`;
-  return `${Math.floor(days / 7)}주 전`;
 }
 
 function escapeHtml(s: string): string {

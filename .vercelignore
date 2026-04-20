@@ -1,0 +1,8 @@
+public/**/*.html
+public/**/*.json
+state/
+docs/
+scripts/
+.github/
+.bkit/
+.pdca-status.json
