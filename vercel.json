@@ -11,9 +11,6 @@
   ],
   "functions": {
     "api/**/*.ts": {
-      "maxDuration": 60
-    },
-    "api/cron-digest.ts": {
       "maxDuration": 300
     }
   },
