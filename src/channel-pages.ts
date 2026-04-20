@@ -1,10 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import { db } from "./db.js";
-import type { DigestMeta } from "./save.js";
 import { enhancementScript, enhancementStyles } from "./html.js";
-
-const CHANNEL_DIR = resolve("public/channel");
 
 export interface ChannelVideo {
   videoId: string;
@@ -34,42 +28,6 @@ function hashCode(s: string): number {
     h = ((h << 5) - h + s.charCodeAt(i)) | 0;
   }
   return h;
-}
-
-export async function regenerateChannelPages(
-  metas: DigestMeta[],
-): Promise<{ slug: string; name: string; path: string }[]> {
-  await mkdir(CHANNEL_DIR, { recursive: true });
-
-  const byChannel = new Map<string, ChannelVideo[]>();
-  for (const m of metas) {
-    for (const h of m.headlines) {
-      if (!byChannel.has(h.channelName)) {
-        byChannel.set(h.channelName, []);
-      }
-      byChannel.get(h.channelName)!.push({
-        videoId: h.videoId,
-        headline: h.headline,
-        videoTitle: h.videoTitle,
-        stockCount: h.stockCount,
-        digestSlug: m.slug,
-        digestDate: m.generatedAt,
-      });
-    }
-  }
-
-  const results: { slug: string; name: string; path: string }[] = [];
-  for (const [name, videos] of byChannel) {
-    videos.sort(
-      (a, b) => Date.parse(b.digestDate) - Date.parse(a.digestDate),
-    );
-    const slug = channelSlug(name);
-    const html = renderChannelPage(name, videos);
-    const path = resolve(CHANNEL_DIR, `${slug}.html`);
-    await writeFile(path, html, "utf8");
-    results.push({ slug, name, path });
-  }
-  return results;
 }
 
 export function renderChannelPageFromDb(

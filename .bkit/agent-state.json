@@ -1,14 +1,35 @@
 {
   "version": "1.0",
-  "enabled": false,
+  "enabled": true,
   "teamName": "",
   "feature": "Youtube_sum",
   "pdcaPhase": "do",
   "orchestrationPattern": "leader",
   "ctoAgent": "opus",
-  "startedAt": "2026-04-19T10:14:41.734Z",
-  "lastUpdated": "2026-04-20T06:41:40.013Z",
-  "teammates": [],
+  "startedAt": "2026-04-20T14:31:02.000Z",
+  "lastUpdated": "2026-04-20T14:31:21.640Z",
+  "teammates": [
+    {
+      "name": "a11b6520020548db3",
+      "role": "Explore",
+      "model": "sonnet",
+      "status": "completed",
+      "currentTask": null,
+      "taskId": null,
+      "startedAt": "2026-04-20T14:31:02.001Z",
+      "lastActivityAt": "2026-04-20T14:31:16.367Z"
+    },
+    {
+      "name": "abae1eef4fe49a31b",
+      "role": "Explore",
+      "model": "sonnet",
+      "status": "completed",
+      "currentTask": null,
+      "taskId": null,
+      "startedAt": "2026-04-20T14:31:09.495Z",
+      "lastActivityAt": "2026-04-20T14:31:21.639Z"
+    }
+  ],
   "progress": {
     "totalTasks": 0,
     "completedTasks": 0,
