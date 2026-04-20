@@ -10,7 +10,7 @@ import { regenerateLanding } from "./landing.js";
 import { isKakaoConfigured, sendDigestToKakao } from "./kakao.js";
 import { isEmailConfigured, sendDigestEmail } from "./email.js";
 
-const MAX_AGE_HOURS = 24;
+const MAX_AGE_HOURS = 72;
 
 async function main() {
   const channels = await loadChannels();
@@ -29,12 +29,14 @@ async function main() {
     console.log(`\n[${channel.name}] 신규 영상 조회 중...`);
     try {
       const videos = await fetchChannelVideos(channel.id);
+      let skippedSeen = 0, skippedOld = 0;
       const fresh = videos.filter((v) => {
-        if (seen.has(v.videoId)) return false;
+        if (seen.has(v.videoId)) { skippedSeen++; return false; }
         const ts = v.publishedAt ? Date.parse(v.publishedAt) : 0;
-        return ts >= cutoff;
+        if (ts < cutoff) { skippedOld++; return false; }
+        return true;
       });
-      console.log(`  → 전체 ${videos.length}개 중 신규 ${fresh.length}개`);
+      console.log(`  → 전체 ${videos.length}개: 이미처리 ${skippedSeen}개, 오래됨 ${skippedOld}개, 신규 ${fresh.length}개`);
       newVideos.push(...fresh);
     } catch (err) {
       console.error(`  ✗ ${channel.name} 실패:`, (err as Error).message);
