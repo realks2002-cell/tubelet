@@ -12,6 +12,12 @@
   "functions": {
     "api/**/*.ts": {
       "maxDuration": 60
+    },
+    "api/cron-digest.ts": {
+      "maxDuration": 300
     }
-  }
+  },
+  "crons": [
+    { "path": "/api/cron-digest", "schedule": "0 * * * *" }
+  ]
 }
