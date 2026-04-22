@@ -249,7 +249,7 @@ app.post("/api/summarize", async (c) => {
 
     if (kakaoOk()) {
       try {
-        const fullUrl = `${process.env.SITE_URL ?? "http://localhost:" + PORT}${digestUrl}`;
+        const fullUrl = `${process.env.SITE_URL ?? "https://tubelet.vercel.app"}${digestUrl}`;
         await sendDigestToKakao(digest, fullUrl);
       } catch { /* 카톡 실패 무시 */ }
     }

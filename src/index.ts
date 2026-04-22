@@ -83,7 +83,7 @@ async function main() {
   const landingPath = await regenerateLanding();
   console.log(`✓ 랜딩페이지 재생성: ${landingPath}`);
 
-  const siteBase = process.env.SITE_URL ?? `http://localhost:3000`;
+  const siteBase = process.env.SITE_URL ?? "https://tubelet.vercel.app";
   const digestUrl = `${siteBase}/digest/${saved.slug}.html`;
 
   if (isKakaoConfigured()) {
